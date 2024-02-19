@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+
+<head>
+    {% if title %}
+    <title>{{ title }} - Sree Sundareshwara Matrimony</title>
+    {% else %}
+    <title>Sree Sundareshwara Matrimony</title>
+    {% endif %}
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/index.css')}}">
+    <!-- <link rel="stylesheet" href="{{url_for('static',filename='css/profiles.css')}}"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+</head>
+
+    <nav style="position: sticky;" class="navbar">
+        <div class="logo_item">
+          <i class="bx bx-menu" id="sidebarOpen"></i>
+          <img src="../static/css/img/IMG-20230622-WA0000.jpg" alt=""></i>SBSYST
+        </div>
+  
+        <div class="search_bar">
+          <input type="text" placeholder="Search" />
+        </div>
+  
+        <div class="navbar_content">
+          <i class="bi bi-grid"></i>
+          <i class='bx bx-sun' id="darkLight"></i>
+          <i class='bx bx-bell' ></i>
+          <img src="../static/css/img/IMG-20230622-WA0000.jpg" alt="" class="profile" />
+        </div>
+      </nav>
+  
+ 
+      <nav class="sidebar">
+        <div class="menu_content">
+          <ul class="menu_items">
+            <div class="menu_title menu_dahsboard"></div>
+     
+            <li class="item">
+              <div href="#" class="nav_link submenu_item">
+                <span class="navlink_icon">
+                  <i class="bx bx-home-alt"></i>
+                </span>
+                <span class="navlink">Home</span>
+                <i class="bx bx-chevron-right arrow-left"></i>
+              </div>
+  
+              <ul class="menu_items submenu">
+                <a href="#" class="nav_link sublink">LogIN</a>
+                <a href="#" class="nav_link sublink">SignUp</a>
+                <!-- <a href="#" class="nav_link sublink"></a>
+                <a href="#" class="nav_link sublink">Nav Sub Link</a> -->
+              </ul>
+            </li>
+          
+            <li class="item">
+              <div href="#" class="nav_link submenu_item">
+                <span class="navlink_icon">
+                  <i class="bx bx-grid-alt"></i>
+                </span>
+                <span class="navlink">Menu</span>
+                <i class="bx bx-chevron-right arrow-left"></i>
+              </div>
+  
+              <ul class="menu_items submenu">
+                <a href="#" class="nav_link sublink">View Profiles</a>
+                <a href="#" class="nav_link sublink">Send Messages</a>
+                <!-- <a href="#" class="nav_link sublink">Nav Sub Link</a>
+                <a href="#" class="nav_link sublink">Nav Sub Link</a> -->
+              </ul>
+            </li>
+   
+          </ul>
+  
+          <ul class="menu_items">
+            <div class="menu_title menu_editor"></div>
+         
+            <li class="item">
+              <a href="#" class="nav_link">
+                <span class="navlink_icon">
+                  <i class="bx bxs-magic-wand"></i>
+                </span>
+                <span class="navlink">Find Matches</span>
+              </a>
+            </li>
+  
+            <li class="item">
+              <a href="#" class="nav_link">
+                <span class="navlink_icon">
+                  <i class="bx bx-loader-circle"></i>
+                </span>
+                <span class="navlink">Filters</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="#" class="nav_link">
+                <span class="navlink_icon">
+                  <i class="bx bx-filter"></i>
+                </span>
+                <span class="navlink">Filter</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="#" class="nav_link">
+                <span class="navlink_icon">
+                  <i class="bx bx-cloud-upload"></i>
+                </span>
+                <span class="navlink">Upload new</span>
+              </a>
+            </li>
+          </ul>
+          <ul class="menu_items">
+            <div class="menu_title menu_setting"></div>
+            <li class="item">
+              <a href="#" class="nav_link">
+                <span class="navlink_icon">
+                  <i class="bx bx-flag"></i>
+                </span>
+                <span class="navlink">Notifications</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="#" class="nav_link">
+                <span class="navlink_icon">
+                  <i class="bx bx-medal"></i>
+                </span>
+                <span class="navlink">Subscripstions</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="#" class="nav_link">
+                <span class="navlink_icon">
+                  <i class="bx bx-cog"></i>
+                </span>
+                <span class="navlink">Setting</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="#" class="nav_link">
+                <span class="navlink_icon">
+                  <i class="bx bx-layer"></i>
+                </span>
+                <span class="navlink">Features</span>
+              </a>
+            </li>
+          </ul>
+  
+     
+          <div class="bottom_content">
+            <div class="bottom expand_sidebar">
+              <span> Expand</span>
+              <i class='bx bx-log-in' ></i>
+            </div>
+            <div class="bottom collapse_sidebar">
+              <span> Collapse</span>
+              <i class='bx bx-log-out'></i>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+<body>
+    
+
+    {% block content %}{% endblock %}
+</body>
+<script src="{{url_for('static',filename='css/script.js')}}"></script>
+</html>

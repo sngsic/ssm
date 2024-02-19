@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Responsive Website</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: url('../static/css/img/back.png') center/cover no-repeat;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            /* Add backdrop filter */
+            backdrop-filter: blur(10px);
+        }
+
+        #logo {
+            max-width: 80%; /* Adjust as needed */
+            height: auto;
+        }
+
+        #main-content {
+            color: #fff;
+            max-width: 600px; /* Adjust as needed */
+            width: 90%; /* Adjust as needed */
+            margin: 0 auto;
+        }
+
+        #login-form, #signup-form {
+            display: none;
+        }
+
+        #cta-button, #login-button, #signup-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #login-form input, #signup-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                background-size: cover;
+            }
+
+            #logo {
+                max-width: 100%;
+            }
+
+            #main-content {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="main-content">
+        <img id="logo" src="../static/css/img/logoo.png" alt="Your Logo">
+        <div id="login-form">
+            <form>
+                <input type="text" placeholder="Username" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit" id="login-button">Login</button>
+            </form>
+        </div>
+        <div id="signup-form">
+            <form>
+                <input type="text" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <input type="password" placeholder="Confirm Password" required>
+                <button type="submit" id="signup-button">Sign Up</button>
+            </form>
+        </div>
+        <a href="#" id="cta-button" onclick="toggleForms()">Login</a>
+    </div>
+
+    <script>
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const ctaButton = document.getElementById('cta-button');
+
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+                ctaButton.innerText = 'Sign Up';
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+                ctaButton.innerText = 'Login';
+            }
+        }
+    </script>
+</body>
+</html>
