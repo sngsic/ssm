@@ -17,8 +17,7 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", id="login-pass", validators=[DataRequired()])
     submit = SubmitField("Login",name='login')
 
-
 class AdminLoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
-    submit = SubmitField("Login",name='admin-login')
+    submit = SubmitField("Login")
