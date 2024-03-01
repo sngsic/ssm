@@ -28,7 +28,7 @@ def create_public_info_for_new_user(mapper, connection, target):
         session.commit()
 
 # Listen for the after_insert event of the User model
-event.listen(User, 'before_insert', create_public_info_for_new_user)
+event.listen(User, 'after_insert', create_public_info_for_new_user)
 
 from app.routes import *
 # from app import routes, models

@@ -76,6 +76,13 @@ def profile():
     all_users = User.query.all()
     return render_template("profile.html", all_users=all_users)
 
+@app.route("/personalprofile")
+def personalprofile():
+    public_info = PublicInfo.query.filter_by(user_id=current_user.id).first()
+    print("\n\n\n\n\n\n\n",public_info)
+    return render_template('personalprofile.html', public_info=public_info)
+
+
 # Route for user logout
 @app.route("/logout",methods=["GET","POST"])
 @login_required
@@ -83,4 +90,3 @@ def logout():
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("home"))
-

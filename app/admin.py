@@ -26,7 +26,7 @@ class UserView(ModelView):
     column_exclude_list = ('password_hash',)
     # form_excluded_columns = ("password_hash",)
     def is_accessible(self):
-        return current_user.is_authenticated and getattr(current_user, 'is_admin',False)
+        return current_user.is_authenticated #and getattr(current_user, 'is_admin',False)
 
     def on_model_change(self, form, model, is_created):
         # Hash the password if a new user is being created or the password field is modified
@@ -61,10 +61,6 @@ class PublicInfoView(ModelView):
     # Customize the view as needed
     column_list = [
         "name",
-        "dob",
-        "gender",
-        "marital_status",
-        "occupation",
         "user_id",
     ]  # Define which columns to display
     column_filters = ["name", "gender"]  # Add filters for columns

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Welcome to your profile, {{ current_user.username }}!</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Profile Information</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Username:</strong> {{ current_user.username }}</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Public Information</h5>
+                    {% if public_info %}
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Name:</strong> {{ public_info.name }}</li>
+                        <li class="list-group-item"><strong>Date of Birth:</strong> {{ public_info.dob }}</li>
+                        <li class="list-group-item"><strong>Gender:</strong> {{ public_info.gender }}</li>
+                        <li class="list-group-item"><strong>Marital Status :</strong> {{ public_info.marital_status }}</li>
+                        <li class="list-group-item"><strong>Occupation :</strong> {{ public_info.occupation }}</li>
+                        <li class="list-group-item"><strong>Diet :</strong> {{ public_info.diet }}</li>
+                        <li class="list-group-item"><strong>Mother Tongue :</strong> {{ public_info.mother_tongue }}</li>
+                        <li class="list-group-item"><strong>Hobbies :</strong> {{ public_info.hobbies }}</li>
+                    </ul>
+                    {% else %}
+                    <p></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
