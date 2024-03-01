@@ -18,6 +18,8 @@ class User(db.Model, UserMixin):
     blocked = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
 
+    public_info = db.relationship('PublicInfo', backref='user', uselist=False)
+
     def __repr__(self):
         return f"<User {self.username} {self.id}>"
 
@@ -30,19 +32,20 @@ class User(db.Model, UserMixin):
 
 class PublicInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    dob = db.Column(db.Date, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
-    marital_status = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    name = db.Column(db.String(100))#, nullable=False)
+    dob = db.Column(db.Date)#, nullable=False)
+    gender = db.Column(db.String(10))#, nullable=False)
+    marital_status = db.Column(db.String(20))#, nullable=False)
     occupation = db.Column(db.String(100))
     hobbies = db.Column(db.String(255))
     caste = db.Column(db.String(50))
     religion = db.Column(db.String(50))
     education = db.Column(db.String(100))
-    diet = db.Column(db.String(20), nullable=False)
+    diet = db.Column(db.String(20))#, nullable=False)
     mother_tongue = db.Column(db.String(50))
-    smoking_habits = db.Column(db.Boolean, nullable=False)
-    drinking_habits = db.Column(db.Boolean, nullable=False)
+    smoking_habits = db.Column(db.Boolean)#, nullable=False)
+    drinking_habits = db.Column(db.Boolean)#, nullable=False)
 
 
 class PrivateInfo(db.Model):

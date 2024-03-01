@@ -1,20 +1,27 @@
-<!-- profile.html -->
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
-</head>
+{% block content %}
+<h1>Welcome to your profile, {{ current_user.username }}!</h1>
+<!-- Display user profile information here -->
+<div class="row">
+    {% for user in all_users %}
+    <div class="col">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">{{ user.username }}</h5>
+                <p class="card-text">Occupation: {{ user.occupation }}</p>
+                <p class="card-text">Age: {{ user.age }}</p>
+                <a href="#" class="btn btn-primary">See Profile</a>
+            </div>
+        </div>
+    </div>
+    {% if loop.index % 7 == 0 %}
+</div>
+<div class="row">{% endif %}
+    {% endfor %}
+</div>
 
-<body>
-    <h1>Welcome to your profile, {{ current_user.username }}!</h1>
-    <!-- Display user profile information here -->
-    <form action="{{ url_for('logout') }}" method="post">
-        <button type="submit">Logout</button>
-    </form>
-    <h1>Hello</h1>
-</body>
-
-</html>
+<form action="{{ url_for('logout') }}" method="post">
+    <button type="submit">Logout</button>
+</form>
+{% endblock %}

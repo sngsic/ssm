@@ -73,8 +73,8 @@ def verify(username):
 @app.route("/profile")
 @login_required
 def profile():
-    # Profile page
-    return render_template("profile.html")
+    all_users = User.query.all()
+    return render_template("profile.html", all_users=all_users)
 
 # Route for user logout
 @app.route("/logout",methods=["GET","POST"])
