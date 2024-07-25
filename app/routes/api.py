@@ -2,8 +2,10 @@ import os
 from app import db
 from flask_login import current_user, login_required
 from app.forms import PublicInfoForm
-from app.models import PublicInfo, User
-from flask import Blueprint, jsonify, redirect, send_from_directory, url_for
+from app.models import Image, PublicInfo, User
+from flask import Blueprint, current_app, jsonify, redirect, request, send_from_directory, url_for
+
+from werkzeug.utils import secure_filename
 
 api = Blueprint('api', __name__,url_prefix='/api')
 
@@ -65,6 +67,45 @@ def get_public_info():
         return jsonify(data), 200
     else:
         return jsonify({'error': 'Public info not found'}), 404
+
+
+@api.route('/upload_image', methods=['POST'])
+@login_required
+def upload_image():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['image']
+    
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    if len(current_user.images) >= 5:
+        return jsonify({'error': 'You can only upload up to 5 images'}), 400
+    
+    if file:
+        filename = secure_filename(file.filename)
+        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid)
+        
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+        
+        file_path = os.path.join(user_folder, filename)
+        try:
+            file.save(file_path)
+            new_image = Image(uid=current_user.uid, filename=filename, file_path=file_path)
+            db.session.add(new_image)
+            db.session.commit()
+            
+            return jsonify({
+                'success': 'Image uploaded successfully',
+                'id': new_image.id,
+                'url': url_for('api.get_image', uid=current_user.uid, filename=filename)
+            }), 200
+        except Exception as e:
+            return jsonify({'error': 'Failed to upload image'}), 500
+    
+    return jsonify({'error': 'Failed to upload image'}), 500
 
 @api.route('/uploads/<uid>/<filename>')
 @login_required
