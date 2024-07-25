@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, DateField, SelectField, StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length
+from flask_wtf.file import FileAllowed, FileField
+
 
 class LoginForm(FlaskForm):
     logusername = StringField('username', validators=[DataRequired(), Length(min=3, max=15)])
@@ -28,3 +30,7 @@ class PublicInfoForm(FlaskForm):
     smoking_habits = BooleanField('Smoking Habits')
     alcohol_intake = BooleanField('Drinking Habits')
     
+
+class ImageUploadForm(FlaskForm):
+    image = FileField('Upload Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
+    submit = SubmitField('Upload')

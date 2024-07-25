@@ -1,6 +1,7 @@
 from datetime import datetime
-from flask import Blueprint, flash, render_template, url_for
-from flask import request, redirect
+import os
+from flask import Blueprint, current_app, flash, render_template, url_for
+from flask import redirect
 from flask_login import current_user, login_user, logout_user
 
 from app.forms import LoginForm, SignupForm
@@ -73,6 +74,10 @@ def admin_signup():
         db.session.add(log_entry)
         db.session.commit()
         
+        # Create directory for the new user
+        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], new_user.uid)
+        os.makedirs(user_folder, exist_ok=True)
+         
         socketio.emit('user_logged_in', {
                 'uid': new_user.uid,
                 'username': new_user.username,

@@ -1,5 +1,6 @@
-from app.models import AdminLog, User
-from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+import os
+from app.models import AdminLog, Image, User
+from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 from app.forms import SignupForm, LoginForm
 from flask_login import current_user, login_required
 from app.extensions import db
@@ -14,6 +15,7 @@ def admin_auth():
     return render_template('admin/admin_auth.html', login_form=login_form, signup_form=signup_form)
 
 @login_required
+@admin.route('/')
 @admin.route('/index')
 def index():
     if not current_user.is_authenticated:
@@ -32,13 +34,30 @@ def users():
 def delete_user(uid):
     if not current_user.is_authenticated:
         return redirect(url_for("admin.admin_auth"))
+    
     user = User.query.get(uid)
     if user:
+        # Delete associated images
+        images = Image.query.filter_by(uid=uid).all()
+        for image in images:
+            # Delete image from filesystem
+            if os.path.exists(image.file_path):
+                os.remove(image.file_path)
+            # Delete image record from database
+            db.session.delete(image)
+        
+        # Delete user folder from filesystem
+        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid)
+        if os.path.exists(user_folder):
+            os.rmdir(user_folder)  # Use os.rmdir to remove empty directory
+
+        # Delete user record from database
         db.session.delete(user)
         db.session.commit()
+        
         return redirect(url_for('admin.users'))
+    
     return redirect(url_for('admin.users'))
-
 @admin.route('/edit_user/<uid>')
 def edit_user(uid):
     if not current_user.is_authenticated:

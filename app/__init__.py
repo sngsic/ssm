@@ -19,7 +19,7 @@ app.config.from_object(Config)
 migrate = Migrate()
 db.init_app(app)
 socketio.init_app(app, cors_allowed_origins="*")
-migrate.init_app(app)
+migrate.init_app(app,db)
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'index'

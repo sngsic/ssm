@@ -14,6 +14,10 @@ class User(db.Model, UserMixin):
     note = db.Column(db.String(1024), default='None', nullable=True)
     is_logged_in = db.Column(db.Boolean, default=False)  # Add this line
 
+    images = db.relationship('Image', backref='user', lazy=True)
+    public_info = db.relationship('PublicInfo', backref='user', uselist=False)
+    # private_info = db.relationship('PrivateInfo', backref='user', uselist=False)
+
     def generate_uid(self):
         # Generate uid based on username, month, and year
         username_part = self.username[:3].lower()  # First 3 characters of username, converted to lowercase
@@ -64,3 +68,10 @@ class AdminLog(db.Model):
     role = db.Column(db.String(50), nullable=False)
     login_time = db.Column(db.DateTime, nullable=True)
     logout_time = db.Column(db.DateTime, nullable=True)
+
+class Image(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.String(50), db.ForeignKey('user.uid'), nullable=False)
+    filename = db.Column(db.String(150), nullable=False)
+    file_path = db.Column(db.String(150), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
