@@ -1,8 +1,9 @@
-from .extensions import app, db
 from .models import User
+from .config import Config
+from .extensions import app, db, socketio
 
 from flask_login import LoginManager
-from .config import Config
+from flask_migrate import Migrate
 
 from .routes.admin import admin
 from .routes.main import main
@@ -15,7 +16,11 @@ app.register_blueprint(auth)
 app.register_blueprint(api)
 
 app.config.from_object(Config)
+migrate = Migrate()
 db.init_app(app)
+socketio.init_app(app, cors_allowed_origins="*")
+migrate.init_app(app)
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'index'
 
@@ -37,4 +42,4 @@ def list_routes():
 
 
 if __name__ == '__main__':
-    app.run()
+    socketio.run(app)

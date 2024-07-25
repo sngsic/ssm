@@ -1,5 +1,31 @@
-{% extends 'main/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
+<h1>Welcome {{ user.username}}</h1>
+<!-- <form action="{{url_for('auth.logout')}}">
+    <button>Logout</button>
+</form> -->
+<a href="/auth/logout">Logout</a>
+<br>
+
+
+<h1>Public Data</h1>
+<form method="POST" action="{{ url_for('main.add_public_info')}}">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }} {{ form.name() }}<br>
+    {{ form.dob.label }} {{ form.dob() }}<br>
+    {{ form.gender.label }} {{ form.gender() }}<br>
+    {{ form.marital_status.label }} {{ form.marital_status() }}<br>
+    {{ form.occupation.label }} {{ form.occupation() }}<br>
+    {{ form.hobbies.label }} {{ form.hobbies() }}<br>
+    {{ form.caste.label }} {{ form.caste() }}<br>
+    {{ form.religion.label }} {{ form.religion() }}<br>
+    {{ form.education.label }} {{ form.education() }}<br>
+    {{ form.diet.label }} {{ form.diet() }}<br>
+    {{ form.mother_tongue.label }} {{ form.mother_tongue() }}<br>
+    {{ form.smoking_habits.label }} {{ form.smoking_habits() }}<br>
+    {{ form.alcohol_intake.label }} {{ form.alcohol_intake() }}<br>
+    <input type="submit" value="Submit">
+</form>
 
 {% endblock %}

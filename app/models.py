@@ -12,7 +12,8 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(64), default='admin')
     status = db.Column(db.Boolean, default=False)
     note = db.Column(db.String(1024), default='None', nullable=True)
-    
+    is_logged_in = db.Column(db.Boolean, default=False)  # Add this line
+
     def generate_uid(self):
         # Generate uid based on username, month, and year
         username_part = self.username[:3].lower()  # First 3 characters of username, converted to lowercase
@@ -34,6 +35,26 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         return self.uid
+
+
+
+class PublicInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_uid = db.Column(db.String(64), db.ForeignKey('user.uid'), nullable=False)
+    name = db.Column(db.String(100), nullable=False) #split
+    dob = db.Column(db.Date, nullable=False)
+    gender = db.Column(db.String(10), nullable=False)
+    marital_status = db.Column(db.String(20), nullable=False)
+    occupation = db.Column(db.String(100))
+    hobbies = db.Column(db.String(255))
+    caste = db.Column(db.String(50))
+    religion = db.Column(db.String(50))
+    education = db.Column(db.String(100))
+    diet = db.Column(db.String(20), nullable=False)
+    mother_tongue = db.Column(db.String(50))
+    smoking_habits = db.Column(db.Boolean, nullable=False)
+    alcohol_intake = db.Column(db.Boolean, nullable=False)
+
     
 
 class AdminLog(db.Model):
