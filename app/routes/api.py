@@ -128,26 +128,3 @@ def get_image(uid, filename):
     return send_from_directory(user_folder, filename)
 
 
-
-# @api.route('/add_public_info', methods=['POST'])
-# def add_public_info():
-#     data = request.get_json()
-#     public_info = PublicInfo(
-#         user_uid=data['user_uid'],
-#         name=data['name'],
-#         dob=data['dob'],
-#         gender=data['gender'],
-#         marital_status=data['marital_status'],
-#         occupation=data['occupation'],
-#         hobbies=data['hobbies'],
-#         caste=data['caste'],
-#         religion=data['religion'],
-#         education=data['education'],
-#         diet=data['diet'],
-#         mother_tongue=data['mother_tongue'],
-#         smoking_habits=data['smoking_habits'],
-#         alcohol_intake=data['alcohol_intake']
-#     )
-#     db.session.add(public_info)
-#     db.session.commit()
-#     return jsonify({'message': 'Public info added successfully'}), 201

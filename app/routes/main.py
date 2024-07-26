@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, current_app, flash, redirect, render_template, send_from_directory, url_for
 from flask_login import current_user, login_required
-from app.forms import ImageUploadForm, PublicInfoForm
+from app.forms import ImageUploadForm, LoginForm, PublicInfoForm, SignupForm
 from app.models import Image
 from app import db
 
@@ -11,7 +11,9 @@ main = Blueprint('main',__name__)
 @main.route('/')
 @main.route('/index')
 def index():
-    return render_template('main/index.html')
+    signup = SignupForm()
+    login = LoginForm()
+    return render_template('main/index.html', login_form = login, signup_form=signup)
 
 # @login_required
 @main.route('/profile')
@@ -20,7 +22,6 @@ def profile():
     if current_user.is_authenticated:
         return render_template('main/profile.html', form=form)
     return redirect(url_for('main.index'))
-
 
 
 @main.route('/images', methods=['GET'])

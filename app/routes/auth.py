@@ -112,3 +112,68 @@ def admin_logout():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
+
+
+
+@auth.route('/login', methods = ['GET','POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        logusername = form.logusername.data
+        logpassword = form.logpassword.data
+
+        user = User.query.filter_by(username=logusername).first()
+        if user and user.check_password(logpassword):
+            if user.is_logged_in:
+                flash('User is already logged in from another device.', 'danger')
+                return redirect(url_for('main.index'))
+
+            login_user(user)
+            user.is_logged_in = True
+            db.session.commit()
+            
+        
+            return redirect(url_for('main.index'))
+        
+        flash('Invalid username or password', 'danger')
+
+    return render_template('main/index.html', login_form=form, signup_form=SignupForm())
+
+
+@auth.route('/signup', methods=['GET','POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    
+    form = SignupForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            flash('Username already exists', 'danger')
+            return redirect(url_for('main.index'))
+
+        new_user = User(username=username)
+        new_user.set_password(password)
+        new_user.generate_uid()
+
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+        new_user.is_logged_in = True
+
+        db.session.commit()
+        
+        # Create directory for the new user
+        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], new_user.uid)
+        os.makedirs(user_folder, exist_ok=True)
+
+        return redirect(url_for('main.index'))
+
+    return render_template('main/index.html', login_form=LoginForm(), signup_form=form)

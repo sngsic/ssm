@@ -2,7 +2,7 @@ import os
 from app.models import AdminLog, Image, PublicInfo, User
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 from app.forms import PublicInfoForm, SignupForm, LoginForm
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, logout_user
 from app.extensions import db
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
@@ -84,8 +84,12 @@ def edit_user(uid):
     return redirect(url_for('admin.users'))
 
 @admin.route('/clear_logs')
-@login_required
+# @login_required
 def clear_logs():
+    users = User.query.all()
+    logout_user()
+    for user in users:
+        user.is_logged_in = False
     AdminLog.query.delete()
     db.session.commit()
     

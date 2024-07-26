@@ -1,7 +1,45 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
-<form>
-    hi
-</form>
+    {% if not current_user.is_authenticated %}
+        <div class="container">
+            <h2>Login</h2>
+            <hr>
+            <!-- Sign In Form -->
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                {{ login_form.hidden_tag() }}
+                <h3>Sign In</h3>
+                <div class="form-group">
+                    {{ login_form.logusername.label }}<br>
+                    {{ login_form.logusername(size=32, class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ login_form.logpassword.label }}<br>
+                    {{ login_form.logpassword(size=32, class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ login_form.logsubmit(class="btn btn-primary") }}
+                </div>
+            </form>
+        
+            <hr>
+            <!-- Sign Up Form -->
+            <form method="POST" action="{{ url_for('auth.signup') }}">
+                {{ signup_form.hidden_tag() }}
+                <h3>Sign Up</h3>
+                <div class="form-group">
+                    {{ signup_form.username.label }}<br>
+                    {{ signup_form.username(size=32, class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ signup_form.password.label }}<br>
+                    {{ signup_form.password(size=32, class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ signup_form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    {% endif %}
+
 {% endblock %}
