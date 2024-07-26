@@ -1,5 +1,5 @@
 import os
-from app.models import AdminLog, Image, User
+from app.models import AdminLog, Image, PublicInfo, User
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 from app.forms import SignupForm, LoginForm
 from flask_login import current_user, login_required
@@ -30,6 +30,14 @@ def users():
     users = User.query.all()
     return render_template('admin/user_list.html', users = users)
 
+@admin.route('/public_info')
+@login_required
+def public_info():
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.admin_login"))
+    public_infos = PublicInfo.query.all()
+    return render_template('admin/public_info.html', public_infos=public_infos)
+
 @admin.route('/delete_user/<uid>')
 def delete_user(uid):
     if not current_user.is_authenticated:
@@ -58,6 +66,7 @@ def delete_user(uid):
         return redirect(url_for('admin.users'))
     
     return redirect(url_for('admin.users'))
+
 @admin.route('/edit_user/<uid>')
 def edit_user(uid):
     if not current_user.is_authenticated:
@@ -72,3 +81,12 @@ def edit_user(uid):
         flash('User not found', 'danger')
     
     return redirect(url_for('admin.users'))
+
+@admin.route('/clear_logs')
+@login_required
+def clear_logs():
+    AdminLog.query.delete()
+    db.session.commit()
+    
+    return redirect(url_for('admin.index'))
+

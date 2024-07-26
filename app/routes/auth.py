@@ -107,3 +107,8 @@ def admin_logout():
 
     
     return redirect(url_for('admin.admin_auth'))
+
+@auth.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('main.index'))

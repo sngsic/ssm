@@ -1,94 +1,92 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
+<h1 class="mb-4">Your Images</h1>
 <div class="container mt-4">
-    <h1 class="mb-4">Upload Images</h1>
-    
-    <!-- Box with plus sign to trigger upload modal -->
-    <div class="box-container mb-4">
-        <div class="upload-box" id="uploadBox">
-            <span class="plus-sign">+</span>
+    <div class="col-md-3 mb-3 mt-4">
+        <div id="uploadBox" class="img-thumbnail" style="cursor: pointer; display: flex; justify-content: center; align-items: center; height: 200px; border: 2px dashed #ddd;">
+            <span>Click to add an image</span>
         </div>
     </div>
-
-    <!-- Modal for uploading images -->
-    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="uploadModalLabel">Upload Image</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="uploadForm" method="POST" enctype="multipart/form-data">
-                        {{ form.hidden_tag() }}
-                        <div class="form-group">
-                            {{ form.image.label(class="form-label") }}
-                            {{ form.image(class="form-control") }}
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Upload</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+    <div id="imagesContainer" class="row">
+        <!-- Image boxes will be inserted here -->
     </div>
+</div>
 
-    <div class="mt-4">
-        <h3>Your Images</h3>
-        <div class="row" id="imageGallery">
-            {% for image in images %}
-            <div class="col-md-3 mb-3" id="image-{{ image.id }}">
-                <img src="{{ url_for('api.get_image', uid=current_user.uid, filename=image.filename) }}" class="img-thumbnail" alt="Image">
+<!-- Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Upload Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            {% endfor %}
+            <div class="modal-body">
+                <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Choose an image</label>
+                        <input class="form-control" type="file" id="image" name="image">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-document.getElementById('uploadBox').addEventListener('click', function() {
-    // Show the modal when the box is clicked
-    var uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
-    uploadModal.show();
-});
+document.addEventListener('DOMContentLoaded', function() {
+    const imagesContainer = document.getElementById('imagesContainer');
+    const uploadBox = document.getElementById('uploadBox');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+    const uploadButton = document.getElementById('uploadButton');
 
-document.getElementById('uploadForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the form from submitting the default way
+    // Function to fetch and display images
+    function loadImages() {
+        fetch('{{ url_for("api.get_images", uid=current_user.uid) }}')
+            .then(response => response.json())
+            .then(data => {
+                imagesContainer.innerHTML = '';
+                data.images.forEach(url => {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'col-md-3 mb-3';
+                    imgDiv.innerHTML = `<img src="${url}" class="img-thumbnail" alt="Image">`;
+                    imagesContainer.appendChild(imgDiv);
+                });
+            })
+            .catch(error => console.error('Error loading images:', error));
+    }
 
-    var formData = new FormData(this);
-    fetch('{{ url_for("api.upload_image") }}', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Create a new image element and add it to the gallery
-            var imageGallery = document.getElementById('imageGallery');
-            var newImageDiv = document.createElement('div');
-            newImageDiv.className = 'col-md-3 mb-3';
-            newImageDiv.id = 'image-' + data.id;
-            newImageDiv.innerHTML = `<img src="${data.url}" class="img-thumbnail" alt="Image">`;
-            imageGallery.appendChild(newImageDiv);
+    // Initial load of images
+    loadImages();
 
-            // Optionally, clear the form and hide the modal
-            document.getElementById('uploadForm').reset();
-            var uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
-            uploadModal.hide();
-        } else {
-            alert(data.error || 'Failed to upload image');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while uploading the image.');
+    // Show modal when upload box is clicked
+    uploadBox.addEventListener('click', function() {
+        uploadModal.show();
+    });
+
+    // Handle image upload
+    uploadButton.addEventListener('click', function() {
+        const formData = new FormData(uploadForm);
+        fetch('{{ url_for("api.upload_image") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadImages();  // Reload images after successful upload
+                uploadModal.hide();  // Hide the modal
+            } else {
+                alert(data.error || 'Failed to upload image.');
+            }
+        })
+        .catch(error => console.error('Error uploading image:', error));
     });
 });
 </script>
-
-<!-- Bootstrap JavaScript and CSS (make sure these are included in your base template) -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

@@ -23,7 +23,7 @@
         <nav>
             <a href="{{ url_for('admin.index') }}">Home</a>
             <a href="{{ url_for('admin.users') }}">Users</a>
-            <a href="">Public info</a>
+            <a href="{{url_for('admin.public_info')}}">Public info</a>
             <a href="">Private info</a>
             <a href="{{url_for('auth.admin_logout')}}">Logout</a>
         </nav>

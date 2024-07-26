@@ -107,8 +107,23 @@ def upload_image():
     
     return jsonify({'error': 'Failed to upload image'}), 500
 
-@api.route('/uploads/<uid>/<filename>')
+@api.route('/get_images/<uid>', methods=['GET'])
+@login_required
+def get_images(uid):
+    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid)
+    if not os.path.exists(user_folder):
+        return jsonify({'error': 'User folder does not exist'}), 404
+    
+    image_files = []
+    for filename in os.listdir(user_folder):
+        if filename.endswith(('.png', '.jpg', '.jpeg', '.gif')):
+            image_files.append(url_for('api.get_image', uid=uid, filename=filename, _external=True))
+    
+    return jsonify({'images': image_files}), 200
+
+@api.route('/get_image/<uid>/<filename>', methods=['GET'])
 @login_required
 def get_image(uid, filename):
-    user_folder = os.path.join('uploads', uid)
+    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid)
     return send_from_directory(user_folder, filename)
+
