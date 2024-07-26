@@ -1,9 +1,12 @@
 import os
+from PIL import Image
+import io
+
 from app import db
 from flask_login import current_user, login_required
 from app.forms import PublicInfoForm
 from app.models import Image, PublicInfo, User
-from flask import Blueprint, current_app, jsonify, redirect, request, send_from_directory, url_for
+from flask import Blueprint, current_app, jsonify, redirect, request, send_file, send_from_directory, url_for
 
 from werkzeug.utils import secure_filename
 
@@ -128,3 +131,49 @@ def get_image(uid, filename):
     return send_from_directory(user_folder, filename)
 
 
+
+
+@api.route('/upload_profile_pic', methods=['POST'])
+@login_required
+def upload_profile_pic():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['image']
+    
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    if file:
+        # Define the filename to be used for the profile picture
+        filename = 'profile_pic.jpg'
+        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid, 'profile_pic')
+        
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+        
+        file_path = os.path.join(user_folder, filename)
+        try:
+            # Save the file with the new name
+            file.save(file_path)
+            return jsonify({
+                'success': 'Profile picture uploaded successfully',
+                'url': url_for('api.get_profile_pic', uid=current_user.uid)
+            }), 200
+        except Exception as e:
+            return jsonify({'error': 'Failed to upload image'}), 500
+    
+    return jsonify({'error': 'Failed to upload image'}), 500
+
+
+@api.route('/get_profile_pic/<uid>')
+def get_profile_pic(uid):
+    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid, 'profile_pic')
+    filename = 'profile_pic.jpg'
+    file_path = os.path.join(user_folder, filename)
+    
+    if os.path.exists(file_path):
+        return send_file(file_path, mimetype='image/jpeg')
+    else:
+        # Return a placeholder image or a message indicating no profile picture
+        return send_from_directory('static', 'default_profile_pic.png')

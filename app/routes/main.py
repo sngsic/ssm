@@ -16,7 +16,7 @@ def index():
     return render_template('main/index.html', login_form = login, signup_form=signup)
 
 # @login_required
-@main.route('/profile')
+@main.route('/profile', methods=['POST','GET'])
 def profile():
     form = PublicInfoForm()
     if current_user.is_authenticated:
