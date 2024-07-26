@@ -1,7 +1,7 @@
 import os
 from app.models import AdminLog, Image, PublicInfo, User
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
-from app.forms import SignupForm, LoginForm
+from app.forms import PublicInfoForm, SignupForm, LoginForm
 from flask_login import current_user, login_required
 from app.extensions import db
 
@@ -25,10 +25,11 @@ def index():
 
 @admin.route('/users')
 def users():
+    form = PublicInfoForm()
     if not current_user.is_authenticated:
         return redirect(url_for("admin.admin_auth"))
     users = User.query.all()
-    return render_template('admin/user_list.html', users = users)
+    return render_template('admin/user_list.html', users = users, form=form)
 
 @admin.route('/public_info')
 @login_required
