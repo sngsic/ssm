@@ -22,7 +22,7 @@ socketio.init_app(app, cors_allowed_origins="*")
 migrate.init_app(app,db)
 
 login_manager = LoginManager(app)
-login_manager.login_view = 'index'
+login_manager.login_view = 'main.index'
 
 
 @login_manager.user_loader

@@ -22,8 +22,9 @@ def profile():
     return redirect(url_for('main.index'))
 
 
-@login_required
+
 @main.route('/images', methods=['GET'])
+@login_required
 def images():
     form = ImageUploadForm()
     
