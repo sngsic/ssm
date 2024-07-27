@@ -41,7 +41,7 @@ def add_public_info():
         )
         db.session.add(public_info)
         db.session.commit()
-    return redirect(url_for('main.profile'))
+    return redirect(url_for('admin.public_info'))
 
 
 @api.route('/get_public_info', methods=['GET'])

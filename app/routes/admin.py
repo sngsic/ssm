@@ -1,7 +1,8 @@
 import os
+import shutil
 from app.models import AdminLog, Image, PublicInfo, User
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
-from app.forms import PublicInfoForm, SignupForm, LoginForm
+from app.forms import CreateUserForm, PublicInfoForm, SignupForm, LoginForm
 from flask_login import current_user, login_required, logout_user
 from app.extensions import db
 
@@ -26,10 +27,11 @@ def index():
 @admin.route('/users')
 def users():
     form = PublicInfoForm()
+    createuser = CreateUserForm()
     if not current_user.is_authenticated:
         return redirect(url_for("admin.admin_auth"))
     users = User.query.all()
-    return render_template('admin/user_list.html', users = users, form=form)
+    return render_template('admin/user_list.html', users = users, form=form, createuser=createuser)
 
 @admin.route('/public_info')
 @login_required
@@ -58,7 +60,7 @@ def delete_user(uid):
         # Delete user folder from filesystem
         user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid)
         if os.path.exists(user_folder):
-            os.rmdir(user_folder)  # Use os.rmdir to remove empty directory
+            shutil.rmtree(user_folder) 
 
         # Delete user record from database
         db.session.delete(user)
@@ -68,14 +70,14 @@ def delete_user(uid):
     
     return redirect(url_for('admin.users'))
 
-@admin.route('/edit_user/<uid>')
+@admin.route('/edit_user/<uid>',methods=['POST'])
 def edit_user(uid):
     if not current_user.is_authenticated:
         return redirect(url_for("admin.admin_auth"))
     user = User.query.get(uid)
     if user:
-        user.username = request.form['username']
-        user.role = request.form['role']
+        user.username = request.form.get('username')
+        user.role = request.form.get('role')
         db.session.commit()
         flash('User updated successfully', 'success')
     else:
@@ -95,3 +97,37 @@ def clear_logs():
     
     return redirect(url_for('admin.index'))
 
+
+@admin.route('/add_user', methods=['GET','POST'])
+def add_user():
+    form = CreateUserForm()
+    if form.validate_on_submit():
+        # Check if the username already exists
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user:
+            return redirect(url_for('admin.index'))
+
+        # Create a new user
+        new_user = User(username=form.username.data)
+        new_user.set_password(form.password.data)
+        # Optionally, set other attributes like role, generate uid, etc.
+        new_user.generate_uid()
+
+        # Save the new user to the database
+        db.session.add(new_user)
+        db.session.commit()
+        
+        # Create user folder for storing files
+        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], new_user.uid)
+        os.makedirs(user_folder, exist_ok=True)
+
+
+        return redirect(url_for('admin.users'))  # Redirect to admin index after successful user creation
+
+    return render_template('admin.html', form=form)
+
+@admin.route('/delete_public')
+def delete_public():
+    PublicInfo().query.delete()
+    db.session.commit()
+    return redirect(url_for('admin.public_info'))

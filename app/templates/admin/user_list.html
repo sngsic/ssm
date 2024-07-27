@@ -3,7 +3,45 @@
 {% block content %}
 <div class="container">
     <h1 class="mt-4">Users</h1>
-    <table id="users-table" class="table table-striped table-bordered mt-3">
+    <hr>
+   
+    <!-- Create User Button -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createUserModal">
+        Create User
+    </button>
+
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">Create User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('admin.add_user') }}">
+                        {{ createuser.hidden_tag() }}
+                        <div class="form-group">
+                            {{ createuser.username.label(class="form-label") }}
+                            {{ createuser.username(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ createuser.password.label(class="form-label") }}
+                            {{ createuser.password(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table id="users-table" class="table table-striped table-bordered mt-3 text-nowrap">
         <thead class="thead-dark">
             <tr>
                 <th>Uid</th>
@@ -20,141 +58,225 @@
                 <td>{{ user.role }}</td>
                 <td>
                     {% if user != current_user %}
-                        <a href="{{ url_for('admin.edit_user', uid=user.uid) }}" class="btn btn-primary btn-sm">Edit</a>
-                        <a href="{{ url_for('admin.delete_user', uid=user.uid) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
-                    {% endif %}
+                        <!-- Edit Role Button -->
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editRoleModal{{ user.uid }}">
+                            Edit Role
+                        </button>
 
-                    <!-- Add Public Data Button is visible for all users -->
-                    <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#addPublicInfoModal" data-uid="{{ user.uid }}">Add Public Data</button>
+                        <!-- Edit Role Modal -->
+                        <div class="modal fade" id="editRoleModal{{ user.uid }}" tabindex="-1" aria-labelledby="editRoleModalLabel{{ user.uid }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editRoleModalLabel{{ user.uid }}">Edit Role for {{ user.username }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="{{ url_for('admin.edit_user', uid=user.uid) }}">
+                                            <div class="form-group">
+                                                <label for="role{{ user.uid }}" class="form-label">New Role</label>
+                                                <input type="text" id="role{{ user.uid }}" name="role" class="form-control" value="{{ user.role }}">
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-primary">Save</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('admin.delete_user', uid=user.uid) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+                        
+                        <!-- add public button -->
+                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#addPublicInfoModal" data-uid="{{ user.uid }}" data-user="{{user}}">Add Public Data</button>
+                    {% else %}
+                        <p class="text-center">Action Unavailable</p>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
 
-<!-- Edit User Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit User</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form id="editUserForm" method="POST">
+
+    <!-- Add Public Info Modal -->
+    <div class="modal fade" id="addPublicInfoModal" tabindex="-1" role="dialog" aria-labelledby="addPublicInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPublicInfoModalLabel">Add Public Info</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Role</label>
-                        <input type="text" class="form-control" id="role" name="role" required>
-                    </div>
+                        <!-- <form id="addPublicInfoForm"  method="POST" action="{{ url_for('api.add_public_info') }}">
+                            {{ form.hidden_tag() }}
+                            <div class="form-group">
+                                {{ form.name.label }} {{ form.name(class="form-control", value=current_user.public_info.name) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.dob.label }} {{ form.dob(class="form-control", value=current_user.public_info.dob) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.gender.label }} {{ form.gender(class="form-control", value=current_user.public_info.gender) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.marital_status.label }} {{ form.marital_status(class="form-control", value=current_user.public_info.marital_status) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.occupation.label }} {{ form.occupation(class="form-control", value=current_user.public_info.occupation) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.hobbies.label }} {{ form.hobbies(class="form-control", value=current_user.public_info.hobbies) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.caste.label }} {{ form.caste(class="form-control", value=current_user.public_info.caste) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.religion.label }} {{ form.religion(class="form-control", value=current_user.public_info.religion) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.education.label }} {{ form.education(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.diet.label }} {{ form.diet(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.mother_tongue.label }} {{ form.mother_tongue(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.smoking_habits.label }} {{ form.smoking_habits(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.alcohol_intake.label }} {{ form.alcohol_intake(class="form-control") }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form> -->
+
+                        <!-- former -->
+                        <form id="addPublicInfoForm" method="POST" action="{{ url_for('api.add_public_info') }}">
+                            {{ form.hidden_tag() }}
+                            <div class="form-group">
+                                {{ form.name.label }} {{ form.name(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.dob.label }} {{ form.dob(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.gender.label }} {{ form.gender(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.marital_status.label }} {{ form.marital_status(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.occupation.label }} {{ form.occupation(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.hobbies.label }} {{ form.hobbies(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.caste.label }} {{ form.caste(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.religion.label }} {{ form.religion(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.education.label }} {{ form.education(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.diet.label }} {{ form.diet(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.mother_tongue.label }} {{ form.mother_tongue(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.smoking_habits.label }} {{ form.smoking_habits() }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.alcohol_intake.label }} {{ form.alcohol_intake() }}
+                            </div>
+                            <input type="hidden" id="uid" name="uid">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#previewmodal" id="preview" data-user="{{user}}">Preview Public Data</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div> 
+                        </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Add Public Info Modal -->
-<div class="modal fade" id="addPublicInfoModal" tabindex="-1" role="dialog" aria-labelledby="addPublicInfoModalLabel" aria-hidden="true">
+
+
+
+<!-- preview -->
+<div class="modal fade" id="previewmodal" tabindex="-1" role="dialog" aria-labelledby="addPublicInfoModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addPublicInfoModalLabel">Add Public Info</h5>
+                <h5 class="modal-title" id="addPublicInfoModalLabel">Preview Public Info</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="addPublicInfoForm" method="POST" action="{{ url_for('api.add_public_info') }}">
-                    {{ form.hidden_tag() }}
-                    <div class="form-group">
-                        {{ form.name.label }} {{ form.name(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.dob.label }} {{ form.dob(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.gender.label }} {{ form.gender(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.marital_status.label }} {{ form.marital_status(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.occupation.label }} {{ form.occupation(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.hobbies.label }} {{ form.hobbies(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.caste.label }} {{ form.caste(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.religion.label }} {{ form.religion(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.education.label }} {{ form.education(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.diet.label }} {{ form.diet(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.mother_tongue.label }} {{ form.mother_tongue(class="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.smoking_habits.label }} {{ form.smoking_habits() }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.alcohol_intake.label }} {{ form.alcohol_intake() }}
-                    </div>
-                    <input type="hidden" id="user_uid" name="user_uid">
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <form action="{{ url_for('api.add_public_info') }}">
+                        Name: <p id="prev-name"></p>
+                        DoB: <p id="prev-dob"></p>
+                        Gender: <p id="prev-gender"></p>
+                        Marital Status: <p id="prev-marital-status"></p>
+                        Occupation: <p id="prev-occupation"></p>
+                        Hobbies: <p id="prev-hobbies"></p>
+                        Caste: <p id="prev-caste"></p>
+                        Religion: <p id="prev-religion"></p>
+                        Education: <p id="prev-education"></p>
+                        Diet: <p id="prev-diet"></p>
+                        Mother Tongue: <p id="prev-mother-tongue"></p>
+                        Smoking habits: <p id="prev-smoking"></p>
+                        Drining habits: <p id="prev-drinking"></p>
                         <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
+                    </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Include jQuery and Bootstrap JS -->
-<script>
-    $(document).ready(function() {
-        $('#addPublicInfoModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var uid = button.data('uid');
-            
-            var modal = $(this);
-            modal.find('#user_uid').val(uid);
-        });
 
-        $('#addPublicInfoForm').on('submit', function (event) {
-            event.preventDefault();
-            
-            $.ajax({
-                url: $(this).attr('action'),
-                method: 'POST',
-                data: $(this).serialize(),
-                success: function (response) {
-                    alert('Public info added successfully');
-                    $('#addPublicInfoModal').modal('hide');
-                    location.reload();
-                },
-                error: function (xhr, status, error) {
-                    alert('Error: ' + error);
-                }
-            });
-        });
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function(){
+    $('#preview').click(function(){
+        $('#prev-name').html($('#name').val());
+        $('#prev-dob').html($('#dob').val());
+        $('#prev-gender').html($('#gender option:selected').text());
+        $('#prev-marital-status').html($('#marital_status option:selected').text());
+        $('#prev-occupation').html($('#occupation').val());
+        $('#prev-hobbies').html($('#hobbies').val());
+        $('#prev-caste').html($('#caste').val());
+        $('#prev-religion').html($('#religion').val());
+        $('#prev-education').html($('#education').val());
+        $('#prev-diet').html($('#diet option:selected').text());
+        $('#prev-mother-tongue').html($('#mother_tongue').val());
+        if ($('#smoking_habits').is(':checked')){
+            $('#prev-smoking').html('Yes');
+        }else{
+            $('#prev-smoking').html('No');
+        }
+        if ($('#alcohol_intake').is(':checked')){
+            $('#prev-drinking').html('Yes');
+        }else{
+            $('#prev-drinking').html('No');
+        }
+    })
     });
 </script>
-
 {% endblock %}

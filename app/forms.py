@@ -34,3 +34,9 @@ class PublicInfoForm(FlaskForm):
 class ImageUploadForm(FlaskForm):
     image = FileField('Upload Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
     submit = SubmitField('Upload')
+    
+class CreateUserForm(FlaskForm):
+    username = StringField("Username", id="login-username", validators=[DataRequired()])
+    # mobile_number = StringField('Mobile Number', validators=[DataRequired(), Regexp(r'^\d{10}$', message="Invalid mobile number format.")])
+    password = PasswordField("Password:", id="login-pass", validators=[DataRequired()])
+    submit = SubmitField("Submit",name='submit')

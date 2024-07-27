@@ -8,7 +8,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///database.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_PROTECTION = 'strong'
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
+    # PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
