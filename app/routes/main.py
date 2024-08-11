@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, current_app, flash, redirect, render_template, send_from_directory, url_for
 from flask_login import current_user, login_required
 from app.forms import ImageUploadForm, LoginForm, PublicInfoForm, SignupForm
-from app.models import Image
+from app.models import Image, User
 from app import db
 
 main = Blueprint('main',__name__)
@@ -31,3 +31,9 @@ def images():
     
     images = Image.query.filter_by(uid=current_user.uid).all()
     return render_template('main/images.html', form=form, images=images)
+
+@main.route('/search')
+def search():
+    users = User.query.all()
+    
+    return render_template('main/search.html', users=users)

@@ -16,6 +16,23 @@ class SignupForm(FlaskForm):
 
 
 class PublicInfoForm(FlaskForm):
+    name = StringField('Name',validators=[DataRequired()])
+    dob = DateField('Date of Birth', format='%Y-%m-%d', validators=[DataRequired()])
+    gender = SelectField('Gender', choices=[('male', 'Male'), ('female', 'Female')], validators=[DataRequired()])
+    marital_status = SelectField('Marital Status', choices=[('single', 'Single'), ('married', 'Married')], validators=[DataRequired()])
+    occupation = StringField('Occupation')
+    hobbies = StringField('Hobbies')
+    caste = StringField('Caste')
+    religion = StringField('Religion')
+    education = StringField('Education')
+    diet = SelectField('Diet', choices=[('vegetarian', 'Vegetarian'), ('non-vegetarian', 'Non-Vegetarian'), ('vegan', 'Vegan')], validators=[DataRequired()])
+    mother_tongue = StringField('Mother Tongue')
+    smoking_habits = BooleanField('Smoking Habits')
+    alcohol_intake = BooleanField('Drinking Habits')
+
+
+# preview form
+class PreviewForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     dob = DateField('Date of Birth', format='%Y-%m-%d', validators=[DataRequired()])
     gender = SelectField('Gender', choices=[('male', 'Male'), ('female', 'Female')], validators=[DataRequired()])
@@ -30,6 +47,7 @@ class PublicInfoForm(FlaskForm):
     smoking_habits = BooleanField('Smoking Habits')
     alcohol_intake = BooleanField('Drinking Habits')
     
+
 
 class ImageUploadForm(FlaskForm):
     image = FileField('Upload Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])

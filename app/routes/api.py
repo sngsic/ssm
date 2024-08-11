@@ -41,7 +41,7 @@ def add_public_info():
         )
         db.session.add(public_info)
         db.session.commit()
-    return redirect(url_for('admin.public_info'))
+    return redirect(url_for('admin.users'))
 
 
 @api.route('/get_public_info', methods=['GET'])
@@ -70,6 +70,7 @@ def get_public_info():
         return jsonify(data), 200
     else:
         return jsonify({'error': 'Public info not found'}), 404
+
 
 
 @api.route('/upload_image', methods=['POST'])

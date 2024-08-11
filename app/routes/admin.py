@@ -8,6 +8,15 @@ from app.extensions import db
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
+@admin.route('/delete_data')
+def delete_data():
+    User.query.delete()
+    PublicInfo.query.delete()
+    db.session.commit()
+    logout_user()
+    
+    return redirect(url_for('admin.admin_auth'))
+
 @admin.route('/admin_auth', methods=['GET','POST'])
 def admin_auth():
     signup_form = SignupForm()
@@ -28,10 +37,12 @@ def index():
 def users():
     form = PublicInfoForm()
     createuser = CreateUserForm()
-    if not current_user.is_authenticated:
+    public_infos = PublicInfo.query.all()
+    
+    if not current_user.is_authenticated and current_user.role == 'admin':
         return redirect(url_for("admin.admin_auth"))
     users = User.query.all()
-    return render_template('admin/user_list.html', users = users, form=form, createuser=createuser)
+    return render_template('admin/users.html', users = users, form=form, createuser=createuser, public_infos=public_infos)
 
 @admin.route('/public_info')
 @login_required
@@ -47,6 +58,8 @@ def delete_user(uid):
         return redirect(url_for("admin.admin_auth"))
     
     user = User.query.get(uid)
+    public_data = PublicInfo.query.get(user.uid)
+    
     if user:
         # Delete associated images
         images = Image.query.filter_by(uid=uid).all()
@@ -64,6 +77,7 @@ def delete_user(uid):
 
         # Delete user record from database
         db.session.delete(user)
+        db.session.delete(public_data)
         db.session.commit()
         
         return redirect(url_for('admin.users'))
@@ -76,7 +90,7 @@ def edit_user(uid):
         return redirect(url_for("admin.admin_auth"))
     user = User.query.get(uid)
     if user:
-        user.username = request.form.get('username')
+        # user.username = request.form.get('username')
         user.role = request.form.get('role')
         db.session.commit()
         flash('User updated successfully', 'success')
