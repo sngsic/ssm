@@ -3,14 +3,12 @@
 {% block content %}
 <h1>Welcome {{ current_user.username }}</h1>
 <hr>
-<h3>Public Data</h3>
-<hr>
 
 <div class="container">
     <div class="profile-picture-section">
         <img id="profilePicture" src="{{ url_for('api.get_profile_pic', uid=current_user.uid) }}" alt="Profile Picture" class="img-thumbnail">
-        <button class="btn btn-primary mt-2" data-toggle="modal" data-target="#uploadProfilePicModal">Upload New Profile Picture</button>
-        <div id="profilePicMessage" class="mt-2"></div>
+        <button id="uploadOrEditButton" class="btn btn-primary mt-2" data-toggle="modal" data-target="#uploadProfilePicModal">Upload New Profile Picture</button>
+        <button id="deleteProfilePicButton" class="btn btn-danger mt-2" style="display: none;">Delete Profile Picture</button>
     </div>
 </div>
 
@@ -71,45 +69,45 @@
             </div>
             <div class="modal-body">
                 <form method="POST" action="{{ url_for('api.add_public_info') }}">
-                    {{ form.hidden_tag() }}
+                    {{ public_info_form.hidden_tag() }}
                     <div class="form-group">
-                        {{ form.name.label }} {{ form.name(class="form-control", value=current_user.public_info.name) }}
+                        {{ public_info_form.name.label }} {{ public_info_form.name(class="form-control", value=current_user.public_info.name) }}
                     </div>
                     <div class="form-group">
-                        {{ form.dob.label }} {{ form.dob(class="form-control", value=current_user.public_info.dob) }}
+                        {{ public_info_form.dob.label }} {{ public_info_form.dob(class="form-control", value=current_user.public_info.dob) }}
                     </div>
                     <div class="form-group">
-                        {{ form.gender.label }} {{ form.gender(class="form-control", value=current_user.public_info.gender) }}
+                        {{ public_info_form.gender.label }} {{ public_info_form.gender(class="form-control", value=current_user.public_info.gender) }}
                     </div>
                     <div class="form-group">
-                        {{ form.marital_status.label }} {{ form.marital_status(class="form-control", value=current_user.public_info.marital_status) }}
+                        {{ public_info_form.marital_status.label }} {{ public_info_form.marital_status(class="form-control", value=current_user.public_info.marital_status) }}
                     </div>
                     <div class="form-group">
-                        {{ form.occupation.label }} {{ form.occupation(class="form-control", value=current_user.public_info.occupation) }}
+                        {{ public_info_form.occupation.label }} {{ public_info_form.occupation(class="form-control", value=current_user.public_info.occupation) }}
                     </div>
                     <div class="form-group">
-                        {{ form.hobbies.label }} {{ form.hobbies(class="form-control", value=current_user.public_info.hobbies) }}
+                        {{ public_info_form.hobbies.label }} {{ public_info_form.hobbies(class="form-control", value=current_user.public_info.hobbies) }}
                     </div>
                     <div class="form-group">
-                        {{ form.caste.label }} {{ form.caste(class="form-control", value=current_user.public_info.caste) }}
+                        {{ public_info_form.caste.label }} {{ public_info_form.caste(class="form-control", value=current_user.public_info.caste) }}
                     </div>
                     <div class="form-group">
-                        {{ form.religion.label }} {{ form.religion(class="form-control", value=current_user.public_info.religion) }}
+                        {{ public_info_form.religion.label }} {{ public_info_form.religion(class="form-control", value=current_user.public_info.religion) }}
                     </div>
                     <div class="form-group">
-                        {{ form.education.label }} {{ form.education(class="form-control", value=current_user.public_info.education) }}
+                        {{ public_info_form.education.label }} {{ public_info_form.education(class="form-control", value=current_user.public_info.education) }}
                     </div>
                     <div class="form-group">
-                        {{ form.diet.label }} {{ form.diet(class="form-control", value=current_user.public_info.diet) }}
+                        {{ public_info_form.diet.label }} {{ public_info_form.diet(class="form-control", value=current_user.public_info.diet) }}
                     </div>
                     <div class="form-group">
-                        {{ form.mother_tongue.label }} {{ form.mother_tongue(class="form-control", value=current_user.public_info.mother_tongue) }}
+                        {{ public_info_form.mother_tongue.label }} {{ public_info_form.mother_tongue(class="form-control", value=current_user.public_info.mother_tongue) }}
                     </div>
                     <div class="form-group">
-                        {{ form.smoking_habits.label }} {{ form.smoking_habits(class="form-control", value=current_user.public_info.smoking_habits) }}
+                        {{ public_info_form.smoking_habits.label }} {{ public_info_form.smoking_habits(class="form-control", value=current_user.public_info.smoking_habits) }}
                     </div>
                     <div class="form-group">
-                        {{ form.alcohol_intake.label }} {{ form.alcohol_intake(class="form-control", value=current_user.public_info.alcohol_intake) }}
+                        {{ public_info_form.alcohol_intake.label }} {{ public_info_form.alcohol_intake(class="form-control", value=current_user.public_info.alcohol_intake) }}
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
@@ -118,53 +116,149 @@
     </div>
 </div>
 
+
+<hr>
+<h3>Private Data</h3>
+<hr>
+
+<!-- Private Info Form -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#privateInfoModal">Edit Private Information</button>
+
+<!-- Modal -->
+<div class="modal fade" id="privateInfoModal" tabindex="-1" aria-labelledby="privateInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privateInfoModalLabel">Edit Private Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="">
+                    {{ private_info_form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ private_info_form.phone_number.label }} {{ private_info_form.phone_number(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.address.label }} {{ private_info_form.address(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.email.label }} {{ private_info_form.email(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.personal_details.label }} {{ private_info_form.personal_details(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.height.label }} {{ private_info_form.height(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.weight.label }} {{ private_info_form.weight(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.citizenship.label }} {{ private_info_form.citizenship(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.income.label }} {{ private_info_form.income(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.parent_info.label }} {{ private_info_form.parent_info(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ private_info_form.disabilities.label }} {{ private_info_form.disabilities(class="form-control") }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const uploadForm = document.getElementById('uploadProfilePicForm');
-        const profilePicture = document.getElementById('profilePicture');
-        const profilePicMessage = document.getElementById('profilePicMessage');
+    const uploadForm = document.getElementById('uploadProfilePicForm');
+    const profilePicture = document.getElementById('profilePicture');
+    const profilePicMessage = document.getElementById('profilePicMessage');
+    const uploadOrEditButton = document.getElementById('uploadOrEditButton');
+    const deleteProfilePicButton = document.getElementById('deleteProfilePicButton');
 
-        // Check if the profile picture exists
-        fetch("{{ url_for('api.get_profile_pic', uid=current_user.uid) }}")
-            
-            .catch(error => {
+    // Check if the profile picture exists
+    fetch("{{ url_for('api.get_profile_pic', uid=current_user.uid) }}")
+        .then(response => {
+            if (response.ok) {
+                // If profile picture exists, show it and allow edit/delete
+                response.json().then(data => {
+                    profilePicture.src = response.url;
+                    uploadOrEditButton.textContent = 'Edit Profile Picture';
+                    deleteProfilePicButton.style.display = 'block';  // Show delete button
+                });
+            } else if (response.status === 404) {
+                // No custom profile picture, use default and hide delete button
+                response.json().then(data => {
+                    profilePicture.src = data.default_pic;
+                    uploadOrEditButton.textContent = 'Upload New Profile Picture';
+                    deleteProfilePicButton.style.display = 'none';  // Hide delete button
+                });
+            } else {
                 profilePicMessage.textContent = 'Error fetching profile picture';
-            });
-
-        uploadForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(uploadForm);
-
-            fetch("{{ url_for('api.upload_profile_pic') }}", {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the profile picture src with the new image URL
-                    fetch("{{ url_for('api.get_profile_pic', uid=current_user.uid) }}")
-                        .then(response => response.json())
-                        .then(imageData => {
-                            if (imageData.url) {
-                                profilePicture.src = imageData.url;
-                                profilePicMessage.textContent = '';
-                            } else {
-                                profilePicMessage.textContent = 'Error fetching new profile picture';
-                            }
-                        })
-                        .catch(error => profilePicMessage.textContent = 'Error: ' + error);
-
-                    // Close the modal
-                    $('#uploadProfilePicModal').modal('hide');
-                } else {
-                    alert(data.error);
-                }
-            })
-            .catch(error => {
-                alert('Error: ' + error);
-            });
+            }
+        })
+        .catch(error => {
+            profilePicMessage.textContent = 'Error fetching profile picture';
         });
+
+    // Handle profile picture upload
+    uploadForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(uploadForm);
+
+        fetch("{{ url_for('api.upload_profile_pic') }}", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                fetch("{{ url_for('api.get_profile_pic', uid=current_user.uid) }}")
+                    .then(response => {
+                        if (response.ok) {
+                            profilePicture.src = response.url;
+                            uploadOrEditButton.textContent = 'Edit Profile Picture';
+                            deleteProfilePicButton.style.display = 'block';  // Show delete button
+                        } else {
+                            profilePicMessage.textContent = 'Error fetching new profile picture';
+                        }
+                    })
+                    .catch(error => profilePicMessage.textContent = 'Error: ' + error);
+                $('#uploadProfilePicModal').modal('hide');
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => alert('Error: ' + error));
     });
+
+    // Handle profile picture deletion
+    deleteProfilePicButton.addEventListener('click', function() {
+        fetch("{{ url_for('api.delete_profile_pic') }}", {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                profilePicture.src = "{{ url_for('static', filename='default_profile_pic.png') }}";  // Reset to default profile picture
+                uploadOrEditButton.textContent = 'Upload New Profile Picture';
+                deleteProfilePicButton.style.display = 'none';  // Hide delete button
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => alert('Error: ' + error));
+    });
+});
+
 </script>
 {% endblock %}

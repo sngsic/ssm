@@ -4,8 +4,8 @@ import io
 
 from app import db
 from flask_login import current_user, login_required
-from app.forms import PublicInfoForm
-from app.models import Image, PublicInfo, User
+from app.forms import PrivateInfoForm, PublicInfoForm
+from app.models import Image, PrivateInfo, PublicInfo, User
 from flask import Blueprint, current_app, jsonify, redirect, request, send_file, send_from_directory, url_for
 
 from werkzeug.utils import secure_filename
@@ -41,8 +41,10 @@ def add_public_info():
         )
         db.session.add(public_info)
         db.session.commit()
-    return redirect(url_for('admin.users'))
-
+    if current_user.role == 'admin':
+        return redirect(url_for('admin.users'))
+    elif current_user.role == 'user':
+        return redirect(url_for('main.profile'))
 
 @api.route('/get_public_info', methods=['GET'])
 @login_required
@@ -88,7 +90,14 @@ def upload_image():
         return jsonify({'error': 'You can only upload up to 5 images'}), 400
     
     if file:
+        # Secure the filename and retain its extension
         filename = secure_filename(file.filename)
+        extension = os.path.splitext(filename)[1].lower()
+        
+        # Ensure the extension is one of the allowed image formats
+        if extension not in ['.jpg', '.jpeg', '.png', '.gif']:
+            return jsonify({'error': 'Unsupported image format'}), 400
+        
         user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid)
         
         if not os.path.exists(user_folder):
@@ -96,6 +105,7 @@ def upload_image():
         
         file_path = os.path.join(user_folder, filename)
         try:
+            # Save the file with the original extension
             file.save(file_path)
             new_image = Image(uid=current_user.uid, filename=filename, file_path=file_path)
             db.session.add(new_image)
@@ -107,7 +117,7 @@ def upload_image():
                 'url': url_for('api.get_image', uid=current_user.uid, filename=filename)
             }), 200
         except Exception as e:
-            return jsonify({'error': 'Failed to upload image'}), 500
+            return jsonify({'error': 'Failed to upload image', 'message': str(e)}), 500
     
     return jsonify({'error': 'Failed to upload image'}), 500
 
@@ -115,66 +125,113 @@ def upload_image():
 @login_required
 def get_images(uid):
     user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid)
+    
     if not os.path.exists(user_folder):
         return jsonify({'error': 'User folder does not exist'}), 404
     
     image_files = []
-    for filename in os.listdir(user_folder):
-        if filename.endswith(('.png', '.jpg', '.jpeg', '.gif')):
-            image_files.append(url_for('api.get_image', uid=uid, filename=filename, _external=True))
+    try:
+        for filename in os.listdir(user_folder):
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                image_files.append(url_for('api.get_image', uid=uid, filename=filename, _external=True))
+    except Exception as e:
+        return jsonify({'error': 'Failed to retrieve images', 'message': str(e)}), 500
     
     return jsonify({'images': image_files}), 200
+
 
 @api.route('/get_image/<uid>/<filename>', methods=['GET'])
 @login_required
 def get_image(uid, filename):
     user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid)
-    return send_from_directory(user_folder, filename)
-
-
+    file_path = os.path.join(user_folder, filename)
+    
+    if os.path.exists(file_path):
+        # Determine MIME type based on file extension
+        mime_type = None
+        
+        if filename.lower().endswith('.png'):
+            mime_type = 'image/png'
+        elif filename.endswith('.jpg') or filename.endswith('.jpeg'):
+            mime_type = 'image/jpeg'
+        elif filename.endswith('.gif'):
+            mime_type = 'image/gif'
+        
+        if mime_type:
+            return send_file(file_path, mimetype=mime_type)
+    
+    return jsonify({'error': 'Image not found'}), 404
 
 
 @api.route('/upload_profile_pic', methods=['POST'])
-@login_required
 def upload_profile_pic():
     if 'image' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+        return jsonify(success=False, error="No image part"), 400
     
     file = request.files['image']
-    
     if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    
-    if file:
-        # Define the filename to be used for the profile picture
-        filename = 'profile_pic.jpg'
-        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid, 'profile_pic')
+        return jsonify(success=False, error="No selected file"), 400
+
+    # Check if the file has an allowed extension
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_ext = filename.rsplit('.', 1)[1].lower()
         
+        # Set the filename to profilepic with the correct extension
+        new_filename = f"profilepic.{file_ext}"
+
+        # Define the path to the user's folder
+        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid, 'profilepic')
+
+        # Create the folder if it doesn't exist
         if not os.path.exists(user_folder):
             os.makedirs(user_folder)
-        
-        file_path = os.path.join(user_folder, filename)
-        try:
-            # Save the file with the new name
-            file.save(file_path)
-            return jsonify({
-                'success': 'Profile picture uploaded successfully',
-                'url': url_for('api.get_profile_pic', uid=current_user.uid)
-            }), 200
-        except Exception as e:
-            return jsonify({'error': 'Failed to upload image'}), 500
-    
-    return jsonify({'error': 'Failed to upload image'}), 500
+
+        # Save the file, replacing the old profile picture
+        file_path = os.path.join(user_folder, new_filename)
+        file.save(file_path)
+
+        return jsonify(success=True), 200
+
+    return jsonify(success=False, error="File type not allowed"), 400
 
 
 @api.route('/get_profile_pic/<uid>')
 def get_profile_pic(uid):
-    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid, 'profile_pic')
-    filename = 'profile_pic.jpg'
-    file_path = os.path.join(user_folder, filename)
+    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid, 'profilepic')
     
-    if os.path.exists(file_path):
-        return send_file(file_path, mimetype='image/jpeg')
+    # Look for profilepic with any of the allowed extensions
+    for ext in ['jpg', 'jpeg', 'png', 'gif']:
+        file_path = os.path.join(user_folder, f"profilepic.{ext}")
+        if os.path.exists(file_path):
+            return send_from_directory(user_folder, f"profilepic.{ext}")
+    
+    # If no profile picture is found, return a default image or 404
+    return send_from_directory('uploads', 'default_profile.png')
+
+
+@api.route('/delete_profile_pic', methods=['POST'])
+@login_required
+def delete_profile_pic():
+    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid, 'profilepic')
+    filename = 'profilepic'  # Fixed filename for the profile picture
+
+    # Check for file extensions
+    file_extensions = ['jpg', 'jpeg', 'png', 'gif']
+    file_deleted = False
+
+    for ext in file_extensions:
+        file_path = os.path.join(user_folder, f"{filename}.{ext}")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            file_deleted = True
+            break  # Exit loop once the file is deleted
+
+    if file_deleted:
+        return jsonify(success=True), 200
     else:
-        # Return a placeholder image or a message indicating no profile picture
-        return send_from_directory('static', 'default_profile_pic.png')
+        return jsonify(success=False, error="Profile picture not found"), 404
