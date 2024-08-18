@@ -18,62 +18,87 @@ def get_users():
     print('\n\n\n\n\n\n\n\n\n\n\n', users)
     user_list = [{'username': user.username, 'uid':user.uid , 'role': user.role} for user in users]
     return jsonify(user_list)
-
-@api.route('/add_public_info', methods=['POST','GET'])
+@api.route('/add_public_info', methods=['POST', 'GET'])
 def add_public_info():
     form = PublicInfoForm()
-    if form.validate_on_submit():
-        public_info = PublicInfo(
-            bio = form.bio.data,
-            name=form.name.data,
-            dob=form.dob.data,
-            gender=form.gender.data,
-            marital_status=form.marital_status.data,
-            occupation=form.occupation.data,
-            hobbies=form.hobbies.data,
-            caste=form.caste.data,
-            religion=form.religion.data,
-            education=form.education.data,
-            diet=form.diet.data,
-            mother_tongue=form.mother_tongue.data,
-            smoking_habits=form.smoking_habits.data,
-            alcohol_intake=form.alcohol_intake.data,
-            user_uid=request.form.get('uid')  # Assuming you have current_user available via Flask-Login
-        )
-        db.session.add(public_info)
-        db.session.commit()
-    if current_user.role == 'admin':
-        return redirect(url_for('admin.users'))
-    elif current_user.role == 'user':
-        return redirect(url_for('main.profile'))
-
-@api.route('/get_public_info', methods=['GET'])
-@login_required
-def get_public_info():
-    # Query the public info for the current user
-    public_info = PublicInfo.query.filter_by(user_id=current_user.id).first()
     
-    if public_info:
-        # Prepare data to be returned as JSON
-        data = {
-            'bio':public_info.bio,
-            'name': public_info.name,
-            'dob': public_info.dob,
-            'gender': public_info.gender,
-            'marital_status': public_info.marital_status,
-            'occupation': public_info.occupation,
-            'hobbies': public_info.hobbies,
-            'caste': public_info.caste,
-            'religion': public_info.religion,
-            'education': public_info.education,
-            'diet': public_info.diet,
-            'mother_tongue': public_info.mother_tongue,
-            'smoking_habits': public_info.smoking_habits,
-            'alcohol_intake': public_info.alcohol_intake
-        }
-        return jsonify(data), 200
-    else:
-        return jsonify({'error': 'Public info not found'}), 404
+    if form.validate_on_submit():
+        uid = request.form.get('uid')
+        public_info = PublicInfo.query.filter_by(user_uid=uid).first()
+        
+        if public_info:
+            # Update the existing public_info record
+            public_info.bio = form.bio.data
+            public_info.name = form.name.data
+            public_info.dob = form.dob.data
+            public_info.gender = form.gender.data
+            public_info.marital_status = form.marital_status.data
+            public_info.occupation = form.occupation.data
+            public_info.hobbies = form.hobbies.data
+            public_info.caste = form.caste.data
+            public_info.religion = form.religion.data
+            public_info.education = form.education.data
+            public_info.diet = form.diet.data
+            public_info.mother_tongue = form.mother_tongue.data
+            public_info.smoking_habits = form.smoking_habits.data
+            public_info.alcohol_intake = form.alcohol_intake.data
+        else:
+            # Create a new public_info record
+            public_info = PublicInfo(
+                bio=form.bio.data,
+                name=form.name.data,
+                dob=form.dob.data,
+                gender=form.gender.data,
+                marital_status=form.marital_status.data,
+                occupation=form.occupation.data,
+                hobbies=form.hobbies.data,
+                caste=form.caste.data,
+                religion=form.religion.data,
+                education=form.education.data,
+                diet=form.diet.data,
+                mother_tongue=form.mother_tongue.data,
+                smoking_habits=form.smoking_habits.data,
+                alcohol_intake=form.alcohol_intake.data,
+                user_uid=uid
+            )
+            db.session.add(public_info)
+
+        db.session.commit()
+        
+        # Redirect based on user role
+        if current_user.role == 'admin':
+            return redirect(url_for('admin.users'))
+        elif current_user.role == 'user':
+            return redirect(url_for('main.profile'))
+
+
+# @api.route('/get_public_info', methods=['GET'])
+# @login_required
+# def get_public_info():
+#     # Query the public info for the current user
+#     public_info = PublicInfo.query.filter_by(user_id=current_user.id).first()
+    
+#     if public_info:
+#         # Prepare data to be returned as JSON
+#         data = {
+#             'bio':public_info.bio,
+#             'name': public_info.name,
+#             'dob': public_info.dob,
+#             'gender': public_info.gender,
+#             'marital_status': public_info.marital_status,
+#             'occupation': public_info.occupation,
+#             'hobbies': public_info.hobbies,
+#             'caste': public_info.caste,
+#             'religion': public_info.religion,
+#             'education': public_info.education,
+#             'diet': public_info.diet,
+#             'mother_tongue': public_info.mother_tongue,
+#             'smoking_habits': public_info.smoking_habits,
+#             'alcohol_intake': public_info.alcohol_intake
+#         }
+#         return jsonify(data), 200
+#     else:
+#         return jsonify({'error': 'Public info not found'}), 404
 
 
 
@@ -126,18 +151,8 @@ def get_profile_pic(uid):
             return send_from_directory(user_folder, f"profilepic.{ext}")
     
     # If no profile picture is found, return nothing
-    abort(204)
-# def get_profile_pic(uid):
-#     user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid, 'profilepic')
-    
-#     # Look for profilepic with any of the allowed extensions
-#     for ext in ['jpg', 'jpeg', 'png', 'gif']:
-#         file_path = os.path.join(user_folder, f"profilepic.{ext}")
-#         if os.path.exists(file_path):
-#             return send_from_directory(user_folder, f"profilepic.{ext}")
-    
-#     # If no profile picture is found, return a default image or 404
-#     return send_from_directory('static/uploads', 'default_profile.png')
+    # abort(204)
+    return send_from_directory('static','uploads/default_profile.png'), 404
 
 
 @api.route('/delete_profile_pic', methods=['POST'])
