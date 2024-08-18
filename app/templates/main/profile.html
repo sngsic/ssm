@@ -40,6 +40,7 @@
 
 <hr>
 <!-- Show current values -->
+<p><strong>Bio:</strong>{{ current_user.public_info.bio}} </p>
 <p><strong>Name:</strong> {{ current_user.public_info.name }}</p>
 <p><strong>DOB:</strong> {{ current_user.public_info.dob }}</p>
 <p><strong>Gender:</strong> {{ current_user.public_info.gender }}</p>
@@ -70,6 +71,10 @@
             <div class="modal-body">
                 <form method="POST" action="{{ url_for('api.add_public_info') }}">
                     {{ public_info_form.hidden_tag() }}
+                    <input type="hidden" id="uid" name="uid", value="{{ current_user.uid }}">
+                    <div class="form-group">
+                        {{ public_info_form.bio.label}} {{ public_info_form.bio(class="form-control", value=current_user.public_info.bio)}}
+                    </div>
                     <div class="form-group">
                         {{ public_info_form.name.label }} {{ public_info_form.name(class="form-control", value=current_user.public_info.name) }}
                     </div>

@@ -29,6 +29,7 @@ class PublicInfoForm(FlaskForm):
     mother_tongue = StringField('Mother Tongue')
     smoking_habits = BooleanField('Smoking Habits')
     alcohol_intake = BooleanField('Drinking Habits')
+    bio = StringField("Bio")
 
 class PrivateInfoForm(FlaskForm):
     phone_number = StringField('Phone Number', validators=[DataRequired()])

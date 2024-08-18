@@ -23,7 +23,7 @@ def admin_login():
         logpassword = form.logpassword.data
 
         user = User.query.filter_by(username=logusername).first()
-        if user and user.check_password(logpassword):
+        if user and user.check_password(logpassword) and user.role=='admin':
             if user.is_logged_in:
                 flash('User is already logged in from another device.', 'danger')
                 return redirect(url_for('auth.admin_login'))
@@ -154,7 +154,7 @@ def signup():
             flash('Username already exists', 'danger')
             return redirect(url_for('main.index'))
 
-        new_user = User(username=username)
+        new_user = User(username=username, role='user')
         new_user.set_password(password)
         new_user.generate_uid()
 
@@ -176,7 +176,9 @@ def signup():
 
 @auth.route('/logout')
 def logout():
+    current_user.is_logged_in = False
     logout_user()
+    db.session.commit()
     return redirect(url_for('main.index'))
 
 

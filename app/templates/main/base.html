@@ -26,6 +26,7 @@
             <a href="{{ url_for('main.index') }}">Home</a>
             <a href="{{ url_for('main.profile') }}">Profile</a>
             <a href="{{ url_for('main.images') }}">Images</a>
+            <a href="{{url_for('main.search')}}">Search</a>
             <a href="{{url_for('auth.logout')}}">Logout</a>
         </nav>
         {% block content %}

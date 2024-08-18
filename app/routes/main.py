@@ -38,3 +38,10 @@ def search():
     users = User.query.all()
     
     return render_template('main/search.html', users=users)
+
+
+@main.route('/view/<uid>')
+def view_profile(uid):
+    user = User.query.filter_by(uid=uid).first_or_404()
+    public_info = user.public_info  # Assuming `public_info` is a relationship in the User model
+    return render_template('main/view_profile.html', user=user, public_info=public_info)

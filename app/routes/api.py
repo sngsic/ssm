@@ -24,6 +24,7 @@ def add_public_info():
     form = PublicInfoForm()
     if form.validate_on_submit():
         public_info = PublicInfo(
+            bio = form.bio.data,
             name=form.name.data,
             dob=form.dob.data,
             gender=form.gender.data,
@@ -55,6 +56,7 @@ def get_public_info():
     if public_info:
         # Prepare data to be returned as JSON
         data = {
+            'bio':public_info.bio,
             'name': public_info.name,
             'dob': public_info.dob,
             'gender': public_info.gender,
@@ -73,6 +75,84 @@ def get_public_info():
     else:
         return jsonify({'error': 'Public info not found'}), 404
 
+
+
+
+@api.route('/upload_profile_pic', methods=['POST'])
+def upload_profile_pic():
+    if 'image' not in request.files:
+        return jsonify(success=False, error="No image part"), 400
+    
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify(success=False, error="No selected file"), 400
+
+    # Check if the file has an allowed extension
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_ext = filename.rsplit('.', 1)[1].lower()
+        
+        # Set the filename to profilepic with the correct extension
+        new_filename = f"profilepic.{file_ext}"
+
+        # Define the path to the user's folder
+        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid, 'profilepic')
+
+        # Create the folder if it doesn't exist
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+
+        # Save the file, replacing the old profile picture
+        file_path = os.path.join(user_folder, new_filename)
+        file.save(file_path)
+
+        return jsonify(success=True), 200
+
+    return jsonify(success=False, error="File type not allowed"), 400
+
+
+@api.route('/get_profile_pic/<uid>')
+def get_profile_pic(uid):
+    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid, 'profilepic')
+    
+    # Look for profilepic with any of the allowed extensions
+    for ext in ['jpg', 'jpeg', 'png', 'gif']:
+        file_path = os.path.join(user_folder, f"profilepic.{ext}")
+        if os.path.exists(file_path):
+            return send_from_directory(user_folder, f"profilepic.{ext}")
+    
+    # If no profile picture is found, return a default image or 404
+    return send_from_directory('static/uploads', 'default_profile.png')
+
+
+@api.route('/delete_profile_pic', methods=['POST'])
+@login_required
+def delete_profile_pic():
+    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid, 'profilepic')
+    filename = 'profilepic'  # Fixed filename for the profile picture
+
+    # Check for file extensions
+    file_extensions = ['jpg', 'jpeg', 'png', 'gif']
+    file_deleted = False
+
+    for ext in file_extensions:
+        file_path = os.path.join(user_folder, f"{filename}.{ext}")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            file_deleted = True
+            break  # Exit loop once the file is deleted
+
+    if file_deleted:
+        return jsonify(success=True), 200
+    else:
+        return jsonify(success=False, error="Profile picture not found"), 404
+    
+    
+    
 
 
 @api.route('/upload_image', methods=['POST'])
@@ -161,77 +241,3 @@ def get_image(uid, filename):
             return send_file(file_path, mimetype=mime_type)
     
     return jsonify({'error': 'Image not found'}), 404
-
-
-@api.route('/upload_profile_pic', methods=['POST'])
-def upload_profile_pic():
-    if 'image' not in request.files:
-        return jsonify(success=False, error="No image part"), 400
-    
-    file = request.files['image']
-    if file.filename == '':
-        return jsonify(success=False, error="No selected file"), 400
-
-    # Check if the file has an allowed extension
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-    def allowed_file(filename):
-        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_ext = filename.rsplit('.', 1)[1].lower()
-        
-        # Set the filename to profilepic with the correct extension
-        new_filename = f"profilepic.{file_ext}"
-
-        # Define the path to the user's folder
-        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid, 'profilepic')
-
-        # Create the folder if it doesn't exist
-        if not os.path.exists(user_folder):
-            os.makedirs(user_folder)
-
-        # Save the file, replacing the old profile picture
-        file_path = os.path.join(user_folder, new_filename)
-        file.save(file_path)
-
-        return jsonify(success=True), 200
-
-    return jsonify(success=False, error="File type not allowed"), 400
-
-
-@api.route('/get_profile_pic/<uid>')
-def get_profile_pic(uid):
-    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid, 'profilepic')
-    
-    # Look for profilepic with any of the allowed extensions
-    for ext in ['jpg', 'jpeg', 'png', 'gif']:
-        file_path = os.path.join(user_folder, f"profilepic.{ext}")
-        if os.path.exists(file_path):
-            return send_from_directory(user_folder, f"profilepic.{ext}")
-    
-    # If no profile picture is found, return a default image or 404
-    return send_from_directory('uploads', 'default_profile.png')
-
-
-@api.route('/delete_profile_pic', methods=['POST'])
-@login_required
-def delete_profile_pic():
-    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.uid, 'profilepic')
-    filename = 'profilepic'  # Fixed filename for the profile picture
-
-    # Check for file extensions
-    file_extensions = ['jpg', 'jpeg', 'png', 'gif']
-    file_deleted = False
-
-    for ext in file_extensions:
-        file_path = os.path.join(user_folder, f"{filename}.{ext}")
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            file_deleted = True
-            break  # Exit loop once the file is deleted
-
-    if file_deleted:
-        return jsonify(success=True), 200
-    else:
-        return jsonify(success=False, error="Profile picture not found"), 404

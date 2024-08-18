@@ -58,6 +58,7 @@ class PublicInfo(db.Model):
     mother_tongue = db.Column(db.String(50))
     smoking_habits = db.Column(db.Boolean, nullable=False)
     alcohol_intake = db.Column(db.Boolean, nullable=False)
+    bio = db.Column(db.String(100), nullable=True)
 
 
 class PrivateInfo(db.Model):

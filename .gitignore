@@ -5,7 +5,7 @@ venv/
 # Database files
 *.sqlite3
 *.db
-
+instance/
 # Byte-compiled files
 __pycache__/
 *.pyc
