@@ -52,37 +52,44 @@ def public_info():
     public_infos = PublicInfo.query.all()
     return render_template('admin/public_info.html', public_infos=public_infos)
 
+from flask import current_app, redirect, url_for
+from werkzeug.exceptions import NotFound
+
 @admin.route('/delete_user/<uid>')
 def delete_user(uid):
     if not current_user.is_authenticated:
         return redirect(url_for("admin.admin_auth"))
     
     user = User.query.get(uid)
-    public_data = PublicInfo.query.get(user.uid)
-    
-    if user:
-        # Delete associated images
-        images = Image.query.filter_by(uid=uid).all()
-        for image in images:
-            # Delete image from filesystem
-            if os.path.exists(image.file_path):
-                os.remove(image.file_path)
-            # Delete image record from database
-            db.session.delete(image)
-        
-        # Delete user folder from filesystem
-        user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid)
-        if os.path.exists(user_folder):
-            shutil.rmtree(user_folder) 
+    if not user:
+        return redirect(url_for('admin.users'))  # Or handle error appropriately
 
-        # Delete user record from database
-        db.session.delete(user)
+    # Delete associated public info
+    public_data = PublicInfo.query.filter_by(user_uid=uid).first()  # Adjusted query if `user_uid` is not the primary key
+    
+    if public_data:
         db.session.delete(public_data)
-        db.session.commit()
-        
-        return redirect(url_for('admin.users'))
+    
+    # Delete associated images
+    images = Image.query.filter_by(uid=uid).all()
+    for image in images:
+        # Delete image from filesystem
+        if os.path.exists(image.file_path):
+            os.remove(image.file_path)
+        # Delete image record from database
+        db.session.delete(image)
+    
+    # Delete user folder from filesystem
+    user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid)
+    if os.path.exists(user_folder):
+        shutil.rmtree(user_folder)
+    
+    # Delete user record from database
+    db.session.delete(user)
+    db.session.commit()
     
     return redirect(url_for('admin.users'))
+
 
 @admin.route('/edit_user/<uid>',methods=['POST'])
 def edit_user(uid):
@@ -119,7 +126,8 @@ def add_user():
         # Check if the username already exists
         existing_user = User.query.filter_by(username=form.username.data).first()
         if existing_user:
-            return redirect(url_for('admin.index'))
+            flash("user already exist", 'danger')
+            return redirect(url_for('admin.users'))
 
         # Create a new user
         new_user = User(username=form.username.data)
