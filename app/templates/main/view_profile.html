@@ -1,30 +1,32 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
-<h1>Welcome {{ current_user.username }}</h1>
-<hr>
+    <div class="container">
+        <h1>{{ user.username }}'s Profile</h1>
+        <hr>
 
-<div class="container">
-    <div class="profile-picture-section">
-        <img id="profilePicture" src="{{ url_for('api.get_profile_pic', uid=current_user.uid) }}" alt="Profile Picture" class="img-thumbnail">
+        <div class="profile-picture-section">
+            <img id="profilePicture" src="{{ url_for('api.get_profile_pic', uid=user.uid) }}" alt="Profile Picture" class="img-thumbnail">
+        </div>
+
+        <hr>
+        <!-- Show the selected user's public info -->
+        <p><strong>Bio:</strong> {{ public_info.bio if public_info.bio else 'No bio added' }} </p>
+        <p><strong>Name:</strong> {{ public_info.name }}</p>
+        <p><strong>DOB:</strong> {{ public_info.dob }}</p>
+        <p><strong>Gender:</strong> {{ public_info.gender }}</p>
+        <p><strong>Marital Status:</strong> {{ public_info.marital_status }}</p>
+        <p><strong>Occupation:</strong> {{ public_info.occupation }}</p>
+        <p><strong>Hobbies:</strong> {{ public_info.hobbies }}</p>
+        <p><strong>Caste:</strong> {{ public_info.caste }}</p>
+        <p><strong>Religion:</strong> {{ public_info.religion }}</p>
+        <p><strong>Education:</strong> {{ public_info.education }}</p>
+        <p><strong>Diet:</strong> {{ public_info.diet }}</p>
+        <p><strong>Mother Tongue:</strong> {{ public_info.mother_tongue }}</p>
+        <p><strong>Smoking Habits:</strong> {{ public_info.smoking_habits }}</p>
+        <p><strong>Alcohol Intake:</strong> {{ public_info.alcohol_intake }}</p>
+
+        <!-- Add any additional details you'd like to show here -->
+
     </div>
-</div>
-
-<hr>
-<!-- Show current values -->
-<p><strong>Bio:</strong>{{ current_user.public_info.bio}} </p>
-<p><strong>Name:</strong> {{ current_user.public_info.name }}</p>
-<p><strong>DOB:</strong> {{ current_user.public_info.dob }}</p>
-<p><strong>Gender:</strong> {{ current_user.public_info.gender }}</p>
-<p><strong>Marital Status:</strong> {{ current_user.public_info.marital_status }}</p>
-<p><strong>Occupation:</strong> {{ current_user.public_info.occupation }}</p>
-<p><strong>Hobbies:</strong> {{ current_user.public_info.hobbies }}</p>
-<p><strong>Caste:</strong> {{ current_user.public_info.caste }}</p>
-<p><strong>Religion:</strong> {{ current_user.public_info.religion }}</p>
-<p><strong>Education:</strong> {{ current_user.public_info.education }}</p>
-<p><strong>Diet:</strong> {{ current_user.public_info.diet }}</p>
-<p><strong>Mother Tongue:</strong> {{ current_user.public_info.mother_tongue }}</p>
-<p><strong>Smoking Habits:</strong> {{ current_user.public_info.smoking_habits }}</p>
-<p><strong>Alcohol Intake:</strong> {{ current_user.public_info.alcohol_intake }}</p>
-
 {% endblock %}
