@@ -18,6 +18,8 @@ def get_users():
     print('\n\n\n\n\n\n\n\n\n\n\n', users)
     user_list = [{'username': user.username, 'uid':user.uid , 'role': user.role} for user in users]
     return jsonify(user_list)
+
+
 @api.route('/add_public_info', methods=['POST', 'GET'])
 def add_public_info():
     form = PublicInfoForm()
@@ -70,36 +72,6 @@ def add_public_info():
             return redirect(url_for('admin.users'))
         elif current_user.role == 'user':
             return redirect(url_for('main.profile'))
-
-
-# @api.route('/get_public_info', methods=['GET'])
-# @login_required
-# def get_public_info():
-#     # Query the public info for the current user
-#     public_info = PublicInfo.query.filter_by(user_id=current_user.id).first()
-    
-#     if public_info:
-#         # Prepare data to be returned as JSON
-#         data = {
-#             'bio':public_info.bio,
-#             'name': public_info.name,
-#             'dob': public_info.dob,
-#             'gender': public_info.gender,
-#             'marital_status': public_info.marital_status,
-#             'occupation': public_info.occupation,
-#             'hobbies': public_info.hobbies,
-#             'caste': public_info.caste,
-#             'religion': public_info.religion,
-#             'education': public_info.education,
-#             'diet': public_info.diet,
-#             'mother_tongue': public_info.mother_tongue,
-#             'smoking_habits': public_info.smoking_habits,
-#             'alcohol_intake': public_info.alcohol_intake
-#         }
-#         return jsonify(data), 200
-#     else:
-#         return jsonify({'error': 'Public info not found'}), 404
-
 
 
 
