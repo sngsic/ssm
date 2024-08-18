@@ -37,7 +37,7 @@ def add_public_info():
             mother_tongue=form.mother_tongue.data,
             smoking_habits=form.smoking_habits.data,
             alcohol_intake=form.alcohol_intake.data,
-            user_uid=current_user.uid  # Assuming you have current_user available via Flask-Login
+            user_uid=request.form.get('uid')  # Assuming you have current_user available via Flask-Login
         )
         db.session.add(public_info)
         db.session.commit()

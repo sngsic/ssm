@@ -115,6 +115,7 @@
                     <div class="modal-body">
                             <form methdos="POST" id="addPublicInfoForm" method="POST" action="{{ url_for('api.add_public_info') }}">
                                 {{ form.hidden_tag() }}
+                                <input type="hidden" id="uid" name="uid">
                                 <div class="form-group">
                                     {{ form.name.label }} {{ form.name(class="form-control") }}
                                 </div>
@@ -210,6 +211,13 @@
         $(document).ready(function(){
                 $("#save_preview").click(function(){
                 $("#save_data").trigger("click");
+            });
+
+            $('#addPublicInfoModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var uid = button.data('uid'); // Extract info from data-* attributes
+                var modal = $(this);
+                modal.find('#uid').val(uid); // Set the UID field value
             });
 
             $('#preview').click(function(){

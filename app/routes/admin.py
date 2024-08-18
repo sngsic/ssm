@@ -144,4 +144,4 @@ def add_user():
 def delete_public():
     PublicInfo().query.delete()
     db.session.commit()
-    return redirect(url_for('admin.public_info'))
+    return redirect(url_for('admin.users'))
