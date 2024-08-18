@@ -6,7 +6,7 @@ from app import db
 from flask_login import current_user, login_required
 from app.forms import PrivateInfoForm, PublicInfoForm
 from app.models import Image, PrivateInfo, PublicInfo, User
-from flask import Blueprint, current_app, jsonify, redirect, request, send_file, send_from_directory, url_for
+from flask import Blueprint, abort, current_app, jsonify, redirect, request, send_file, send_from_directory, url_for
 
 from werkzeug.utils import secure_filename
 
@@ -125,8 +125,19 @@ def get_profile_pic(uid):
         if os.path.exists(file_path):
             return send_from_directory(user_folder, f"profilepic.{ext}")
     
-    # If no profile picture is found, return a default image or 404
-    return send_from_directory('static/uploads', 'default_profile.png')
+    # If no profile picture is found, return nothing
+    abort(204)
+# def get_profile_pic(uid):
+#     user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], uid, 'profilepic')
+    
+#     # Look for profilepic with any of the allowed extensions
+#     for ext in ['jpg', 'jpeg', 'png', 'gif']:
+#         file_path = os.path.join(user_folder, f"profilepic.{ext}")
+#         if os.path.exists(file_path):
+#             return send_from_directory(user_folder, f"profilepic.{ext}")
+    
+#     # If no profile picture is found, return a default image or 404
+#     return send_from_directory('static/uploads', 'default_profile.png')
 
 
 @api.route('/delete_profile_pic', methods=['POST'])

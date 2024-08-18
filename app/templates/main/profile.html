@@ -6,7 +6,8 @@
 
 <div class="container">
     <div class="profile-picture-section">
-        <img id="profilePicture" src="{{ url_for('api.get_profile_pic', uid=current_user.uid) }}" alt="Profile Picture" class="img-thumbnail">
+        <!-- <img id="profilePicture" src="{{ url_for('api.get_profile_pic', uid=current_user.uid) }}" alt="Profile Picture" class="img-thumbnail"> -->
+        <img id="profilePicture" src="{{ url_for('static', filename='uploads/default_profile.png') }}" alt="Profile Picture" class="img-thumbnail">
         <button id="uploadOrEditButton" class="btn btn-primary mt-2" data-toggle="modal" data-target="#uploadProfilePicModal">Upload New Profile Picture</button>
         <button id="deleteProfilePicButton" class="btn btn-danger mt-2" style="display: none;">Delete Profile Picture</button>
     </div>
@@ -194,27 +195,22 @@
     fetch("{{ url_for('api.get_profile_pic', uid=current_user.uid) }}")
         .then(response => {
             if (response.ok) {
-                // If profile picture exists, show it and allow edit/delete
-                response.json().then(data => {
-                    profilePicture.src = response.url;
-                    uploadOrEditButton.textContent = 'Edit Profile Picture';
-                    deleteProfilePicButton.style.display = 'block';  // Show delete button
-                });
+                // Profile picture exists, update the src attribute
+                profilePicture.src = response.url;
+                uploadOrEditButton.textContent = 'Edit Profile Picture';
+                deleteProfilePicButton.style.display = 'block';  // Show delete button
             } else if (response.status === 404) {
-                // No custom profile picture, use default and hide delete button
-                response.json().then(data => {
-                    profilePicture.src = data.default_pic;
-                    uploadOrEditButton.textContent = 'Upload New Profile Picture';
-                    deleteProfilePicButton.style.display = 'none';  // Hide delete button
-                });
+                // No profile picture found, use the default image
+                profilePicture.src = "{{ url_for('static', filename='default_profile.png') }}";
+                uploadOrEditButton.textContent = 'Upload New Profile Picture';
+                deleteProfilePicButton.style.display = 'none';  // Hide delete button
             } else {
                 profilePicMessage.textContent = 'Error fetching profile picture';
             }
         })
         .catch(error => {
-            profilePicMessage.textContent = 'Error fetching profile picture';
+            profilePicMessage.textContent = 'Error fetching profile picture: ' + error;
         });
-
     // Handle profile picture upload
     uploadForm.addEventListener('submit', function(event) {
         event.preventDefault();
