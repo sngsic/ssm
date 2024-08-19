@@ -1,6 +1,4 @@
-{% extends 'admin/admin_base.html' %}
-
-{% block content %}
+{% block public_content %}
 <div class="container mt-4">
     <h1 class="mb-4">Public Information</h1>
     <table class="table table-striped">
@@ -8,6 +6,7 @@
             <tr>
                 <th>UID</th>
                 <th>Name</th>
+                <th>Bio</th>
                 <th>Date of Birth</th>
                 <th>Gender</th>
                 <th>Marital Status</th>
@@ -27,6 +26,7 @@
             <tr>
                 <td>{{ info.user_uid }}</td>
                 <td>{{ info.name }}</td>
+                <td>{{ info.bio }}</td>
                 <td>{{ info.dob }}</td>
                 <td>{{ info.gender }}</td>
                 <td>{{ info.marital_status }}</td>
@@ -37,6 +37,8 @@
                 <td>{{ info.education }}</td>
                 <td>{{ info.diet }}</td>
                 <td>{{ info.mother_tongue }}</td>
+                <!-- <td>{{info.smoking_habits}}</td>
+                <td>{{info.alcohol_intake}} </td> -->
                 <td>{{ 'Yes' if info.smoking_habits else 'No' }}</td>
                 <td>{{ 'Yes' if info.alcohol_intake else 'No' }}</td>
             </tr>

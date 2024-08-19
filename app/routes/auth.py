@@ -10,6 +10,8 @@ from app.extensions import db, socketio
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
+
+########## Admin
 @auth.route('/admin_login', methods = ['GET','POST'])
 def admin_login():
     if current_user.is_authenticated:
@@ -21,7 +23,7 @@ def admin_login():
         logpassword = form.logpassword.data
 
         user = User.query.filter_by(username=logusername).first()
-        if user and user.check_password(logpassword):
+        if user and user.check_password(logpassword) and user.role=='admin':
             if user.is_logged_in:
                 flash('User is already logged in from another device.', 'danger')
                 return redirect(url_for('auth.admin_login'))
@@ -105,17 +107,10 @@ def admin_logout():
     logout_user()
     db.session.commit()
 
-    
     return redirect(url_for('admin.admin_auth'))
 
-@auth.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('main.index'))
 
-
-
-
+############# User
 @auth.route('/login', methods = ['GET','POST'])
 def login():
     if current_user.is_authenticated:
@@ -159,7 +154,7 @@ def signup():
             flash('Username already exists', 'danger')
             return redirect(url_for('main.index'))
 
-        new_user = User(username=username)
+        new_user = User(username=username, role='user')
         new_user.set_password(password)
         new_user.generate_uid()
 
@@ -177,3 +172,82 @@ def signup():
         return redirect(url_for('main.index'))
 
     return render_template('main/index.html', login_form=LoginForm(), signup_form=form)
+
+
+@auth.route('/logout')
+def logout():
+    current_user.is_logged_in = False
+    logout_user()
+    db.session.commit()
+    return redirect(url_for('main.index'))
+
+
+########### Data Entry
+@auth.route('/data_entry_login', methods = ['GET','POST'])
+def data_entry_login():
+    if current_user.is_authenticated:
+        return redirect(url_for('data_enrty.index'))
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        logusername = form.logusername.data
+        logpassword = form.logpassword.data
+
+        user = User.query.filter_by(username=logusername).first()
+        if user and user.check_password(logpassword):
+            if user.is_logged_in:
+                flash('User is already logged in from another device.', 'danger')
+                return redirect(url_for('data_enrty.index'))
+
+            login_user(user)
+            user.is_logged_in = True
+            db.session.commit()
+            
+        
+            return redirect(url_for('main.index'))
+        
+        flash('Invalid username or password', 'danger')
+
+    return render_template('dataentry/index.html', login_form=form, signup_form=SignupForm())
+
+
+@auth.route('/data_entry_signup', methods=['GET','POST'])
+def data_entry_signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('data_entry.index'))
+    
+    form = SignupForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            flash('Username already exists', 'danger')
+            return redirect(url_for('data_entry.index'))
+
+        new_user = User(username=username, role='data entry')
+        new_user.set_password(password)
+        new_user.generate_uid()
+
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+        new_user.is_logged_in = True
+
+        db.session.commit()
+        
+        # # Create directory for the new user
+        # user_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], new_user.uid)
+        # os.makedirs(user_folder, exist_ok=True)
+
+        return redirect(url_for('data_entry.index'))
+
+    return render_template('dataentry/index.html', login_form=LoginForm(), signup_form=form)
+
+
+@auth.route('/data_entry_logout')
+def data_entry_logout():
+    logout_user()
+    return redirect(url_for('data_entry.index'))
+

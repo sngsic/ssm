@@ -5,11 +5,13 @@ from .extensions import app, db, socketio
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
+from .routes.dataentry import data_entry
 from .routes.admin import admin
 from .routes.main import main
 from .routes.auth import auth
 from .routes.api import api
 
+app.register_blueprint(data_entry)
 app.register_blueprint(admin)
 app.register_blueprint(main)
 app.register_blueprint(auth)

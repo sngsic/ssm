@@ -1,5 +1,23 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
-
+    <div>
+        <h1>Search</h1>
+        <hr>
+        
+        <div class="display_users d-flex flex-row">
+            {% for user in users %}
+                {% if user!= current_user and user.role == 'user' %}
+                    <div class="card" style="width: 18rem;">
+                        <img class="card-img-top" src="{{ url_for('api.get_profile_pic', uid=user.uid) }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ user.public_info.name}}</h5>
+                            <p class="card-text">{{ user.public_info.bio if user.public_info.bio else 'No bio added' }}</p>
+                            <a href="{{ url_for('main.view_profile', uid=user.uid) }}" class="btn btn-primary">Visit</a>
+                        </div> 
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

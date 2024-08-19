@@ -58,6 +58,24 @@ class PublicInfo(db.Model):
     mother_tongue = db.Column(db.String(50))
     smoking_habits = db.Column(db.Boolean, nullable=False)
     alcohol_intake = db.Column(db.Boolean, nullable=False)
+    bio = db.Column(db.String(100), nullable=True)
+
+
+class PrivateInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_uid = db.Column(db.String(64), db.ForeignKey('user.uid'), nullable=False)
+    phone_number = db.Column(db.String(20), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    personal_details = db.Column(db.String(255))
+    height = db.Column(db.Float)
+    weight = db.Column(db.Float)
+    citizenship = db.Column(db.String(100))
+    income = db.Column(db.Integer)
+    parent_info = db.Column(db.String(255))
+    disabilities = db.Column(db.String(255))
+
+    user = db.relationship('User', backref=db.backref('private_info', uselist=False))
 
     
 

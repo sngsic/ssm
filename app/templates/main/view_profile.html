@@ -1,0 +1,32 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{ user.username }}'s Profile</h1>
+        <hr>
+
+        <div class="profile-picture-section">
+            <img id="profilePicture" src="{{ url_for('api.get_profile_pic', uid=user.uid) }}" alt="Profile Picture" class="img-thumbnail">
+        </div>
+
+        <hr>
+        <!-- Show the selected user's public info -->
+        <p><strong>Bio:</strong> {{ public_info.bio if public_info.bio else 'No bio added' }} </p>
+        <p><strong>Name:</strong> {{ public_info.name }}</p>
+        <p><strong>DOB:</strong> {{ public_info.dob }}</p>
+        <p><strong>Gender:</strong> {{ public_info.gender }}</p>
+        <p><strong>Marital Status:</strong> {{ public_info.marital_status }}</p>
+        <p><strong>Occupation:</strong> {{ public_info.occupation }}</p>
+        <p><strong>Hobbies:</strong> {{ public_info.hobbies }}</p>
+        <p><strong>Caste:</strong> {{ public_info.caste }}</p>
+        <p><strong>Religion:</strong> {{ public_info.religion }}</p>
+        <p><strong>Education:</strong> {{ public_info.education }}</p>
+        <p><strong>Diet:</strong> {{ public_info.diet }}</p>
+        <p><strong>Mother Tongue:</strong> {{ public_info.mother_tongue }}</p>
+        <p><strong>Smoking Habits:</strong> {{ public_info.smoking_habits }}</p>
+        <p><strong>Alcohol Intake:</strong> {{ public_info.alcohol_intake }}</p>
+
+        <!-- Add any additional details you'd like to show here -->
+
+    </div>
+{% endblock %}
